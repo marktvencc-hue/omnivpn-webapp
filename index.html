@@ -60,7 +60,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 30px 20px 10px 20px; /* Увеличено padding-top */
+            padding: 30px 20px 10px 20px;
             min-height: 0;
         }
 
@@ -225,6 +225,44 @@
             color: rgba(255,255,255,0.8);
             font-size: 14px;
             padding: 12px;
+        }
+
+        /* Маленькая кнопка для FAQ */
+        .button-small {
+            display: inline-block;
+            width: auto;
+            padding: 8px 16px;
+            margin: 0;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 400;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.8);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            letter-spacing: 0.2px;
+        }
+
+        .button-small:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Контейнер для ряда с профилем и FAQ */
+        .profile-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .profile-row .button {
+            flex: 1;
+            margin: 0;
         }
 
         /* Спиннер загрузки */
@@ -471,7 +509,12 @@
                         
                         <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
                         <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
-                        <button class="button" onclick="showProfile()">👤 Профиль</button>
+                        
+                        <!-- Ряд с профилем и FAQ -->
+                        <div class="profile-row">
+                            <button class="button" onclick="showProfile()">👤 Профиль</button>
+                            <button class="button-small" onclick="openFAQ()">❓ FAQ</button>
+                        </div>
                     </div>
                 </div>
 
@@ -579,6 +622,7 @@
         const API_URL = 'https://omnivpn.us.ci';
         const SUPPORT_BOT_USERNAME = 'SupportBot';
         const USER_AGREEMENT_URL = 'https://telegra.ph/User-Agreement';
+        const FAQ_URL = 'https://telegra.ph/FAQ-OmniVPN-01'; // Замените на вашу ссылку
 
         // Ссылки на приложение по платформам
         const APP_LINKS = {
@@ -859,11 +903,14 @@
             tg.openLink(USER_AGREEMENT_URL);
         }
 
+        // Новая функция для открытия FAQ
+        function openFAQ() {
+            tg.openLink(FAQ_URL);
+        }
+
         // ---------- ИНИЦИАЛИЗАЦИЯ ----------
         loadStatus();
     </script>
 </body>
 </html>
-
-
 

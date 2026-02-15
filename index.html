@@ -22,7 +22,7 @@
             position: fixed;
         }
 
-        /* Градиентный фон */
+        /* Градиентный фон, исходящий от логотипа */
         body::before {
             content: '';
             position: fixed;
@@ -30,8 +30,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.03) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.03) 0%, transparent 50%);
+            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.05) 0%, transparent 60%);
             pointer-events: none;
             z-index: 0;
         }
@@ -55,7 +54,7 @@
             overflow: hidden;
         }
 
-        /* Верхняя часть с логотипом */
+        /* Верхняя часть с логотипом - теперь по центру между верхом и контентом */
         .logo-section {
             flex: 1.2;
             display: flex;
@@ -70,8 +69,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 220px;  /* Фиксированная ширина */
-            height: 140px; /* Фиксированная высота */
+            width: 220px;
+            height: 140px;
             max-width: 100%;
         }
 
@@ -87,7 +86,17 @@
             z-index: 2;
         }
 
-        /* Волны */
+        /* Волны - несколько слоёв с более светлой границей */
+        .wave-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
         .wave {
             position: absolute;
             top: 50%;
@@ -96,33 +105,83 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            z-index: 1;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: transparent;
             opacity: 0;
             pointer-events: none;
         }
 
-        @keyframes wave-animation {
+        /* Три волны с разной задержкой */
+        .wave-1 {
+            animation: wave-animation-1 1.2s ease-out infinite;
+        }
+
+        .wave-2 {
+            animation: wave-animation-2 1.2s ease-out infinite;
+        }
+
+        .wave-3 {
+            animation: wave-animation-3 1.2s ease-out infinite;
+        }
+
+        @keyframes wave-animation-1 {
             0% {
                 transform: translate(-50%, -50%) scale(1);
-                opacity: 0.4;
+                opacity: 0.6;
+                border-color: rgba(255,255,255,0.5);
             }
             100% {
-                transform: translate(-50%, -50%) scale(2.5);
+                transform: translate(-50%, -50%) scale(2.2);
                 opacity: 0;
+                border-color: rgba(255,255,255,0.8);
             }
         }
 
-        .wave-active {
-            animation: wave-animation 0.8s ease-out forwards;
+        @keyframes wave-animation-2 {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.6;
+                border-color: rgba(255,255,255,0.5);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2.2);
+                opacity: 0;
+                border-color: rgba(255,255,255,0.8);
+            }
+        }
+
+        @keyframes wave-animation-3 {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.6;
+                border-color: rgba(255,255,255,0.5);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2.2);
+                opacity: 0;
+                border-color: rgba(255,255,255,0.8);
+            }
+        }
+
+        /* Класс для запуска анимации волн */
+        .waves-active .wave-1 {
+            animation: wave-animation-1 1.2s ease-out forwards;
+        }
+
+        .waves-active .wave-2 {
+            animation: wave-animation-2 1.2s ease-out 0.1s forwards;
+        }
+
+        .waves-active .wave-3 {
+            animation: wave-animation-3 1.2s ease-out 0.2s forwards;
         }
 
         /* Анимация пульсации для логотипа */
         @keyframes heartbeat {
             0% { transform: scale(1); }
-            15% { transform: scale(1.15); }
+            15% { transform: scale(1.1); }
             30% { transform: scale(1); }
-            45% { transform: scale(1.08); }
+            45% { transform: scale(1.05); }
             60% { transform: scale(1); }
             100% { transform: scale(1); }
         }
@@ -413,7 +472,14 @@
             <div class="logo-section">
                 <div class="logo-wrapper" id="logoWrapper">
                     <img src="https://raw.githubusercontent.com/marktvencc-hue/omnivpn-webapp/main/photo_5226932146939826416_c.png" alt="OmniVPN" class="logo-image" id="logoImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <div class="wave" id="wave"></div>
+                    
+                    <!-- Контейнер для трёх волн -->
+                    <div class="wave-container" id="waveContainer">
+                        <div class="wave wave-1"></div>
+                        <div class="wave wave-2"></div>
+                        <div class="wave wave-3"></div>
+                    </div>
+                    
                     <div style="display: none; color: white; font-size: 32px; font-weight: 700; letter-spacing: 4px;">◉</div>
                 </div>
             </div>
@@ -571,22 +637,22 @@
         // Функция для пульсации логотипа и волн
         function pulseLogo() {
             const logo = document.getElementById('logoImage');
-            const wave = document.getElementById('wave');
+            const waveContainer = document.getElementById('waveContainer');
             
             logo.classList.add('logo-pulse');
-            wave.classList.add('wave-active');
+            waveContainer.classList.add('waves-active');
             
             setTimeout(() => {
                 logo.classList.remove('logo-pulse');
-                wave.classList.remove('wave-active');
-            }, 800);
+                waveContainer.classList.remove('waves-active');
+            }, 1200);
         }
 
-        // Запускаем пульсацию логотипа каждые 30 секунд
-        setInterval(pulseLogo, 30000);
+        // Запускаем пульсацию логотипа каждые 5 секунд
+        setInterval(pulseLogo, 5000);
 
-        // Первая пульсация через 5 секунд после загрузки
-        setTimeout(pulseLogo, 5000);
+        // Первая пульсация через 2 секунды после загрузки
+        setTimeout(pulseLogo, 2000);
 
         // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
         async function fetchWithAuth(url, options = {}) {

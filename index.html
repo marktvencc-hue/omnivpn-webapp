@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OmniVPN</title>
+    <title>UltimaVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -46,14 +46,25 @@
             overflow: hidden;
         }
 
-        /* Верхняя часть с логотипом — занимает всё свободное место */
-        .logo-section {
-            flex: 1;
+        /* Верхняя часть с логотипом и статусом — пропорция 40% */
+        .top-section {
+            flex: 1.2; /* Примерно 40% экрана */
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 10px;
-            min-height: 0; /* важно для корректной работы flex */
+            min-height: 0;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 280px;
+            margin-bottom: 15px;
         }
 
         .logo-image {
@@ -61,27 +72,55 @@
             max-height: 100%;
             width: auto;
             height: auto;
-            object-fit: contain; /* логотип целиком, без обрезания */
+            object-fit: contain;
             filter: brightness(0) invert(1);
             transform-origin: center;
+            position: relative;
+            z-index: 2;
         }
 
-        /* Анимация пульсации для логотипа */
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            15% { transform: scale(1.1); }
-            30% { transform: scale(1); }
-            45% { transform: scale(1.05); }
-            60% { transform: scale(1); }
-            100% { transform: scale(1); }
+        /* Анимированные волны (серые круги) */
+        .wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .logo-pulse {
-            animation: heartbeat 0.8s ease-in-out;
+        @keyframes wave-animation {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2.5);
+                opacity: 0;
+            }
         }
 
-        /* Нижняя часть с контентом — фиксированная, прижата к низу */
-        .content-section {
+        .logo-pulse .wave {
+            animation: wave-animation 0.8s ease-out forwards;
+        }
+
+        /* Статус подписки */
+        .status-text {
+            font-size: 18px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            line-height: 1.4;
+            max-width: 280px;
+        }
+
+        /* Нижняя часть с контентом */
+        .bottom-section {
             flex: 0 0 auto;
             padding: 0 16px 16px 16px;
             width: 100%;
@@ -98,27 +137,15 @@
             width: 100%;
         }
 
-        /* Статус подписки (без заголовка) */
-        .status-text {
-            font-size: 16px;
-            font-weight: 400;
-            color: rgba(255,255,255,0.9);
-            line-height: 1.4;
-            text-align: center;
-            padding: 8px 0 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 12px;
-        }
-
-        /* Кнопки - более компактные */
+        /* Кнопки */
         .button {
             display: block;
             width: 100%;
-            padding: 12px;
-            margin: 6px 0;
+            padding: 14px;
+            margin: 8px 0;
             border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 14px;
-            font-size: 14px;
+            border-radius: 16px;
+            font-size: 16px;
             font-weight: 500;
             cursor: pointer;
             text-align: center;
@@ -137,8 +164,13 @@
         .button.secondary {
             border-color: rgba(255,255,255,0.2);
             color: rgba(255,255,255,0.7);
-            font-size: 13px;
-            padding: 10px;
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        /* Специальный контейнер для трёх основных кнопок */
+        .main-buttons {
+            margin-bottom: 12px;
         }
 
         /* Спиннер загрузки */
@@ -299,7 +331,7 @@
             }
         }
 
-        .content-section > div {
+        .bottom-section > div {
             animation: fadeIn 0.25s ease-out;
         }
 
@@ -344,18 +376,36 @@
             font-size: 13px;
             line-height: 1.5;
         }
+
+        /* Адаптация для маленьких экранов */
+        @media (max-height: 600px) {
+            .top-section {
+                flex: 1;
+            }
+            .logo-wrapper {
+                max-width: 200px;
+            }
+            .button {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="app">
-        <!-- Верхняя часть с логотипом — занимает всё свободное место -->
-        <div class="logo-section">
-            <img src="https://i.ibb.co/LhNz4rXy/photo-5226932146939826416-c.jpg" alt="OmniVPN" class="logo-image" id="logoImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <div style="display: none; color: white; font-size: 32px; font-weight: 700; letter-spacing: 4px;">◉</div>
+        <!-- Верхняя часть с логотипом и статусом -->
+        <div class="top-section">
+            <div class="logo-wrapper" id="logoWrapper">
+                <img src="https://drive.google.com/uc?export=view&id=1ESCJ2tJ1DKYR7tnXpqIa6fILYp0qzME4" alt="UltimaVPN" class="logo-image" id="logoImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="wave" id="wave"></div>
+                <div style="display: none; color: white; font-size: 32px; font-weight: 700;">◉</div>
+            </div>
+            <div class="status-text" id="statusText">Загрузка...</div>
         </div>
 
-        <!-- Нижняя часть с контентом — прижата к низу -->
-        <div class="content-section">
+        <!-- Нижняя часть с кнопками -->
+        <div class="bottom-section">
             <!-- Главный экран -->
             <div id="mainScreen">
                 <div class="actions-container">
@@ -366,9 +416,13 @@
                         </div>
                     </div>
                     
-                    <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
-                    <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
-                    <button class="button" onclick="showProfile()">👤 Профиль</button>
+                    <div class="main-buttons">
+                        <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
+                        <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
+                        <button class="button" onclick="showProfile()">👤 Профиль</button>
+                    </div>
+                    
+                    <button class="button secondary" onclick="openSupport()">🆘 Поддержка</button>
                 </div>
             </div>
 
@@ -472,7 +526,7 @@
 
     <script>
         // ---------- НАСТРОЙКИ ----------
-        const API_URL = 'https://omnivpn.us.ci';
+        const API_URL = 'https://omnivpn.us.ci'; // Замените на ваш домен
         const SUPPORT_BOT_USERNAME = 'SupportBot';
         const USER_AGREEMENT_URL = 'https://telegra.ph/User-Agreement';
 
@@ -503,16 +557,21 @@
         let currentStep = 1;
         let currentSubscriptionUrl = '';
 
-        // Функция для пульсации логотипа
+        // Функция для пульсации логотипа и волн
         function pulseLogo() {
             const logo = document.getElementById('logoImage');
+            const wrapper = document.getElementById('logoWrapper');
+            
             logo.classList.add('logo-pulse');
+            wrapper.classList.add('logo-pulse');
+            
             setTimeout(() => {
                 logo.classList.remove('logo-pulse');
+                wrapper.classList.remove('logo-pulse');
             }, 800);
         }
 
-        // Запускаем пульсацию логотипа каждые 30 секунд
+        // Запускаем пульсацию каждые 30 секунд
         setInterval(pulseLogo, 30000);
 
         // Первая пульсация через 5 секунд после загрузки
@@ -544,8 +603,8 @@
             // Показываем нужный экран
             document.getElementById(screenId).classList.remove('hidden');
             
-            // Сбрасываем прокрутку (контент не скроллится, но на всякий случай)
-            document.querySelector('.content-section').scrollTop = 0;
+            // Сбрасываем прокрутку
+            document.querySelector('.bottom-section').scrollTop = 0;
         }
 
         function backToMain() {
@@ -755,3 +814,4 @@
     </script>
 </body>
 </html>
+

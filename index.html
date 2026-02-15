@@ -22,7 +22,7 @@
             position: fixed;
         }
 
-        /* Градиентный фон, исходящий от логотипа */
+        /* Градиентный фон, исходящий от центра логотипа и смещённый вниз */
         body::before {
             content: '';
             position: fixed;
@@ -30,7 +30,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.05) 0%, transparent 70%);
+            background: radial-gradient(circle at 50% 35%, rgba(255,255,255,0.06) 0%, transparent 75%);
             pointer-events: none;
             z-index: 0;
         }
@@ -54,13 +54,13 @@
             overflow: hidden;
         }
 
-        /* Верхняя часть с логотипом */
+        /* Верхняя часть с логотипом - смещена ниже */
         .logo-section {
             flex: 1.2;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 30px 20px 10px 20px; /* Увеличено padding-top */
             min-height: 0;
         }
 
@@ -86,7 +86,7 @@
             z-index: 2;
         }
 
-        /* Контейнер для волн - теперь больше, чтобы волны уходили за пределы */
+        /* Контейнер для волн */
         .wave-container {
             position: absolute;
             top: 50%;
@@ -105,51 +105,61 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.08); /* Очень тонкая, почти невидимая граница */
+            border: 1px solid rgba(255,255,255,0.06);
             background: transparent;
             opacity: 0;
             pointer-events: none;
-            box-shadow: 0 0 20px rgba(255,255,255,0.03); /* Едва заметное свечение */
+            box-shadow: 0 0 30px rgba(255,255,255,0.02);
         }
 
         /* Класс для запуска анимации волн */
         .waves-active .wave-1 {
-            animation: wave-animation 2s ease-out forwards;
+            animation: wave-animation 2.5s cubic-bezier(0.25, 0.1, 0.15, 1) forwards;
         }
 
         .waves-active .wave-2 {
-            animation: wave-animation 2s ease-out 0.25s forwards;
+            animation: wave-animation 2.5s cubic-bezier(0.25, 0.1, 0.15, 1) 0.3s forwards;
         }
 
         .waves-active .wave-3 {
-            animation: wave-animation 2s ease-out 0.5s forwards;
+            animation: wave-animation 2.5s cubic-bezier(0.25, 0.1, 0.15, 1) 0.6s forwards;
         }
 
         @keyframes wave-animation {
             0% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.3;
-                border-color: rgba(255,255,255,0.1);
+                transform: translate(-50%, -50%) scale(0.9);
+                opacity: 0.25;
+                border-color: rgba(255,255,255,0.08);
+            }
+            30% {
+                opacity: 0.2;
+                border-color: rgba(255,255,255,0.05);
+            }
+            60% {
+                opacity: 0.1;
+                border-color: rgba(255,255,255,0.03);
             }
             100% {
-                transform: translate(-50%, -50%) scale(8); /* Уходим далеко за границы экрана */
+                transform: translate(-50%, -50%) scale(10);
                 opacity: 0;
-                border-color: rgba(255,255,255,0.02);
+                border-color: rgba(255,255,255,0.01);
             }
         }
 
-        /* Анимация пульсации для логотипа */
+        /* Анимация пульсации для логотипа - более плавная */
         @keyframes heartbeat {
             0% { transform: scale(1); }
-            15% { transform: scale(1.1); }
-            30% { transform: scale(1); }
-            45% { transform: scale(1.05); }
+            10% { transform: scale(1.08); }
+            20% { transform: scale(1); }
+            30% { transform: scale(1.04); }
+            40% { transform: scale(1); }
+            50% { transform: scale(1.02); }
             60% { transform: scale(1); }
             100% { transform: scale(1); }
         }
 
         .logo-pulse {
-            animation: heartbeat 0.8s ease-in-out;
+            animation: heartbeat 2s ease-in-out;
         }
 
         /* Нижняя часть с контентом */
@@ -177,7 +187,7 @@
         /* Статус подписки - жирный */
         .status-text {
             font-size: 16px;
-            font-weight: 600;  /* Сделано жирнее */
+            font-weight: 600;
             color: rgba(255,255,255,0.95);
             line-height: 1.5;
             text-align: center;
@@ -608,7 +618,7 @@
             setTimeout(() => {
                 logo.classList.remove('logo-pulse');
                 waveContainer.classList.remove('waves-active');
-            }, 2000);
+            }, 2500);
         }
 
         // Запускаем пульсацию логотипа каждые 5 секунд
@@ -854,5 +864,6 @@
     </script>
 </body>
 </html>
+
 
 

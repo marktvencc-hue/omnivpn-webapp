@@ -46,24 +46,24 @@
             overflow: hidden;
         }
 
-        /* Верхняя часть с логотипом - отдельно */
+        /* Верхняя часть с логотипом - без ограничений */
         .logo-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 5px 5px 0 5px;
-            height: 40vh; /* Фиксированная высота для логотипа */
-            min-height: 100px;
+            padding: 20px 20px 10px 20px;
+            flex: 0 0 auto; /* Не растягивается, занимает только нужное место */
         }
 
         .logo-image {
-            max-width: 90%;
-            max-height: 90%;
             width: auto;
             height: auto;
-            object-fit: contain;
+            max-width: 90vw; /* Не шире 90% ширины экрана */
+            max-height: 40vh; /* Не выше 40% высоты экрана, но не сжимает, если меньше */
+            object-fit: scale-down; /* Масштабирует, но не обрезает */
             filter: brightness(0) invert(1);
             transform-origin: center;
+            display: block; /* Убираем лишние отступы */
         }
 
         /* Анимация пульсации для логотипа */
@@ -353,7 +353,7 @@
 </head>
 <body>
     <div class="app">
-        <!-- Логотип отдельно - не обрезается -->
+        <!-- Логотип отдельно - теперь без жестких ограничений -->
         <div class="logo-container">
             <img src="https://i.ibb.co/LhNz4rXy/photo-5226932146939826416-c.jpg" alt="OmniVPN" class="logo-image" id="logoImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <div style="display: none; color: white; font-size: 32px; font-weight: 700; letter-spacing: 4px;">◉</div>

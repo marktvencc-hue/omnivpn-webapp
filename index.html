@@ -1,38 +1,350 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: sans-serif;
-            padding: 20px;
-            text-align: center;
-            background: var(--tg-theme-bg-color, #fff);
-            color: var(--tg-theme-text-color, #000);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
         }
-        button {
+        .header {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #ccc);
+        }
+        .container {
+            padding: 16px;
+        }
+        .status-card {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
             background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #fff);
+            color: var(--tg-theme-button-text-color, #ffffff);
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
-            margin: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+        }
+        .button.secondary {
+            background: transparent;
+            border: 1px solid var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-color, #2481cc);
+        }
+        .hidden {
+            display: none;
+        }
+        .tariff-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #ddd);
+        }
+        .link {
+            color: var(--tg-theme-link-color, #2481cc);
+            word-break: break-all;
+        }
+        .back-button {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>OmniVPN</h1>
-    <p>Добро пожаловать в мини-приложение!</p>
-    <button onclick="Telegram.WebApp.close()">Закрыть</button>
+    <div class="header">OmniVPN</div>
+    <div class="container" id="mainScreen">
+        <div class="status-card" id="statusText">Загрузка...</div>
+        <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
+        <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
+        <button class="button" onclick="showProfile()">👤 Профиль</button>
+    </div>
+
+    <div class="container hidden" id="tariffsScreen">
+        <h3>Выберите тариф</h3>
+        <div class="tariff-grid">
+            <button class="button" onclick="buyTariff('1month')">1 месяц — 150 ⭐</button>
+            <button class="button" onclick="buyTariff('3months')">3 месяца — 250 ⭐</button>
+            <button class="button" onclick="buyTariff('6months')">6 месяцев — 350 ⭐</button>
+            <button class="button" onclick="buyTariff('1year')">1 год — 500 ⭐</button>
+        </div>
+        <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+    </div>
+
+    <div class="container hidden" id="setupScreen">
+        <h3 id="deviceHint">Установка на ...</h3>
+        <p>Настройка VPN в 3 шага</p>
+        <button class="button" onclick="startSetup()">Начать настройку</button>
+        <div id="setupSteps" class="hidden">
+            <p>Шаг 1. Установите приложение Happ</p>
+            <button class="button" id="installButton" onclick="installApp()">Установить</button>
+            <button class="button secondary" onclick="nextStep()">Далее</button>
+            <p class="hidden" id="step2">
+                Шаг 2. Добавьте подписку в приложение Happ<br>
+                Выберите протокол:
+                <button class="button" onclick="addSubscription('vless')">VLESS</button>
+                <button class="button" onclick="addSubscription('vmess')">VMESS</button>
+                <button class="button" onclick="addSubscription('snowflake')">Snowflake</button>
+                <button class="button secondary" onclick="nextStep()">Далее</button>
+            </p>
+            <p class="hidden" id="step3">
+                Шаг 3. Готово! Нажмите на круглую кнопку в приложении Happ
+                <button class="button" onclick="finishSetup()">Завершить настройку</button>
+            </p>
+        </div>
+        <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+    </div>
+
+    <div class="container hidden" id="profileScreen">
+        <h3>Профиль</h3>
+        <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
+        <button class="button" onclick="openSupport()">🆘 Связаться с поддержкой</button>
+        <button class="button" onclick="showTransactions()">📜 Мои транзакции</button>
+        <button class="button" onclick="openAgreement()">📄 Пользовательское соглашение</button>
+        <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+    </div>
+
+    <div class="container hidden" id="referralScreen">
+        <h3>Реферальная программа</h3>
+        <p>За каждого приглашенного друга вы получите 15% бонусных дней от его пополнений.</p>
+        <div id="referralInfo">Загрузка...</div>
+        <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
+    </div>
+
+    <div class="container hidden" id="transactionsScreen">
+        <h3>История транзакций</h3>
+        <div id="transactionsList">Загрузка...</div>
+        <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
+    </div>
 
     <script>
-        // Сообщаем Telegram, что приложение готово
-        Telegram.WebApp.ready();
-        // Показываем основную кнопку (опционально)
-        Telegram.WebApp.MainButton.setText('Главная').show();
+        // ---------- НАСТРОЙКИ ----------
+        const API_URL = 'http://78.153.139.96:8080'; // ⚠️ замените на ваш сервер
+        const SUPPORT_BOT_USERNAME = 'SupportBot';   // ⚠️ username бота поддержки (без @)
+        const USER_AGREEMENT_URL = 'https://telegra.ph/User-Agreement'; // ссылка на соглашение
+
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        let currentStep = 1; // для настройки
+
+        // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
+        async function fetchWithAuth(url, options = {}) {
+            options.headers = {
+                ...options.headers,
+                'X-Telegram-Init-Data': tg.initData
+            };
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.error || `HTTP ${response.status}`);
+            }
+            return response.json();
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function backToMain() {
+            showScreen('mainScreen');
+            loadStatus();
+        }
+
+        function backToProfile() {
+            showScreen('profileScreen');
+        }
+
+        // ---------- ЗАГРУЗКА СТАТУСА НА ГЛАВНОЙ ----------
+        async function loadStatus() {
+            try {
+                const data = await fetchWithAuth(API_URL + '/api/user_status');
+                const statusEl = document.getElementById('statusText');
+                if (data.subscription_end) {
+                    const date = new Date(data.subscription_end);
+                    statusEl.innerText = `Подписка активна до ${date.toLocaleDateString()}`;
+                } else {
+                    statusEl.innerText = 'Подписка не активирована. Пробный период 3 дня.';
+                }
+            } catch (e) {
+                document.getElementById('statusText').innerText = 'Ошибка загрузки статуса';
+            }
+        }
+
+        // ---------- ПОКАЗ ЭКРАНОВ ----------
+        function showTariffs() {
+            showScreen('tariffsScreen');
+        }
+
+        function showProfile() {
+            showScreen('profileScreen');
+        }
+
+        function showSetup() {
+            showScreen('setupScreen');
+            const platform = tg.platform || 'unknown';
+            document.getElementById('deviceHint').innerText = `Установка на ${platform}`;
+            document.getElementById('setupSteps').classList.add('hidden');
+            currentStep = 1;
+        }
+
+        function showReferral() {
+            showScreen('referralScreen');
+            loadReferralInfo();
+        }
+
+        function showTransactions() {
+            showScreen('transactionsScreen');
+            loadTransactions();
+        }
+
+        // ---------- ПОКУПКА ТАРИФА ----------
+        async function buyTariff(tariff) {
+            try {
+                const data = await fetchWithAuth(API_URL + '/api/create_invoice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tariff })
+                });
+                if (data.invoice_link) {
+                    tg.openInvoice(data.invoice_link);
+                } else {
+                    alert('Ошибка создания счёта');
+                }
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+            }
+        }
+
+        // ---------- РЕФЕРАЛЬНАЯ ИНФОРМАЦИЯ ----------
+        async function loadReferralInfo() {
+            try {
+                const data = await fetchWithAuth(API_URL + '/api/referral_info');
+                let html = `<div class="info-row"><span>Приглашено друзей:</span> <strong>${data.count}</strong></div>`;
+                html += `<div class="info-row"><span>Ваша ссылка:</span> <span class="link">${data.link}</span></div>`;
+                html += `<h4>История начислений:</h4>`;
+                if (data.history.length === 0) {
+                    html += '<p>Пока нет начислений</p>';
+                } else {
+                    data.history.forEach(item => {
+                        const date = new Date(item.created_at).toLocaleDateString();
+                        html += `<div class="info-row"><span>${date}</span> <strong>+${item.bonus_days} дней</strong></div>`;
+                    });
+                }
+                document.getElementById('referralInfo').innerHTML = html;
+            } catch (e) {
+                document.getElementById('referralInfo').innerText = 'Ошибка загрузки';
+            }
+        }
+
+        // ---------- ИСТОРИЯ ТРАНЗАКЦИЙ ----------
+        async function loadTransactions() {
+            try {
+                const trans = await fetchWithAuth(API_URL + '/api/transactions');
+                let html = '';
+                if (trans.length === 0) {
+                    html = '<p>Пока нет покупок</p>';
+                } else {
+                    trans.forEach(t => {
+                        const date = new Date(t.created_at).toLocaleDateString();
+                        html += `<div class="info-row"><span>${date} (${t.tariff})</span> <strong>${t.amount_stars} ⭐</strong></div>`;
+                    });
+                }
+                document.getElementById('transactionsList').innerHTML = html;
+            } catch (e) {
+                document.getElementById('transactionsList').innerText = 'Ошибка загрузки';
+            }
+        }
+
+        // ---------- НАСТРОЙКА ----------
+        function startSetup() {
+            document.getElementById('setupSteps').classList.remove('hidden');
+        }
+
+        function installApp() {
+            // Определяем платформу и открываем ссылку на магазин
+            const platform = tg.platform;
+            let url = '';
+            if (platform.includes('android')) {
+                url = 'https://play.google.com/store/apps/details?id=org.happ.app';
+            } else if (platform.includes('ios')) {
+                url = 'https://apps.apple.com/app/happ';
+            } else if (platform.includes('windows')) {
+                url = 'https://github.com/happ/releases/latest';
+            } else if (platform.includes('macos')) {
+                url = 'https://apps.apple.com/app/happ';
+            } else {
+                url = 'https://github.com/happ/releases/latest';
+            }
+            tg.openLink(url);
+        }
+
+        function nextStep() {
+            if (currentStep === 1) {
+                document.getElementById('step2').classList.remove('hidden');
+                currentStep = 2;
+            } else if (currentStep === 2) {
+                document.getElementById('step3').classList.remove('hidden');
+                currentStep = 3;
+            }
+        }
+
+        async function addSubscription(protocol) {
+            try {
+                const data = await fetchWithAuth(API_URL + '/api/add_subscription', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ protocol })
+                });
+                if (data.subscription_url) {
+                    alert('Подписка добавлена! Скопируйте ссылку в приложение Happ: ' + data.subscription_url);
+                } else {
+                    alert('Ошибка добавления подписки');
+                }
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+            }
+        }
+
+        function finishSetup() {
+            backToMain();
+        }
+
+        // ---------- ПРОФИЛЬ: ПОДДЕРЖКА И СОГЛАШЕНИЕ ----------
+        function openSupport() {
+            tg.openTelegramLink('https://t.me/' + SUPPORT_BOT_USERNAME);
+        }
+
+        function openAgreement() {
+            tg.openLink(USER_AGREEMENT_URL);
+        }
+
+        // ---------- ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ----------
+        loadStatus();
     </script>
 </body>
 </html>

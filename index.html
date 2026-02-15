@@ -46,24 +46,24 @@
             overflow: hidden;
         }
 
-        /* Верхняя часть с логотипом - без ограничений */
-        .logo-container {
+        /* Верхняя часть с логотипом — занимает всё свободное место */
+        .logo-section {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px 20px 10px 20px;
-            flex: 0 0 auto; /* Не растягивается, занимает только нужное место */
+            padding: 10px;
+            min-height: 0; /* важно для корректной работы flex */
         }
 
         .logo-image {
+            max-width: 100%;
+            max-height: 100%;
             width: auto;
             height: auto;
-            max-width: 90vw; /* Не шире 90% ширины экрана */
-            max-height: 40vh; /* Не выше 40% высоты экрана, но не сжимает, если меньше */
-            object-fit: scale-down; /* Масштабирует, но не обрезает */
+            object-fit: contain; /* логотип целиком, без обрезания */
             filter: brightness(0) invert(1);
             transform-origin: center;
-            display: block; /* Убираем лишние отступы */
         }
 
         /* Анимация пульсации для логотипа */
@@ -80,16 +80,11 @@
             animation: heartbeat 0.8s ease-in-out;
         }
 
-        /* Контейнер для контента, прижатый к низу */
-        .bottom-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+        /* Нижняя часть с контентом — фиксированная, прижата к низу */
+        .content-section {
+            flex: 0 0 auto;
             padding: 0 16px 16px 16px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
+            width: 100%;
         }
 
         /* Контейнер для всех кнопок и статуса */
@@ -304,7 +299,7 @@
             }
         }
 
-        .bottom-container > div {
+        .content-section > div {
             animation: fadeIn 0.25s ease-out;
         }
 
@@ -353,14 +348,14 @@
 </head>
 <body>
     <div class="app">
-        <!-- Логотип отдельно - теперь без жестких ограничений -->
-        <div class="logo-container">
+        <!-- Верхняя часть с логотипом — занимает всё свободное место -->
+        <div class="logo-section">
             <img src="https://i.ibb.co/LhNz4rXy/photo-5226932146939826416-c.jpg" alt="OmniVPN" class="logo-image" id="logoImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <div style="display: none; color: white; font-size: 32px; font-weight: 700; letter-spacing: 4px;">◉</div>
         </div>
 
-        <!-- Контейнер для контента, прижатый к низу -->
-        <div class="bottom-container">
+        <!-- Нижняя часть с контентом — прижата к низу -->
+        <div class="content-section">
             <!-- Главный экран -->
             <div id="mainScreen">
                 <div class="actions-container">
@@ -549,8 +544,8 @@
             // Показываем нужный экран
             document.getElementById(screenId).classList.remove('hidden');
             
-            // Сбрасываем прокрутку
-            document.querySelector('.bottom-container').scrollTop = 0;
+            // Сбрасываем прокрутку (контент не скроллится, но на всякий случай)
+            document.querySelector('.content-section').scrollTop = 0;
         }
 
         function backToMain() {

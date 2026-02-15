@@ -30,7 +30,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.05) 0%, transparent 60%);
+            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.05) 0%, transparent 70%);
             pointer-events: none;
             z-index: 0;
         }
@@ -54,13 +54,13 @@
             overflow: hidden;
         }
 
-        /* Верхняя часть с логотипом - теперь по центру между верхом и контентом */
+        /* Верхняя часть с логотипом */
         .logo-section {
             flex: 1.2;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 20px;
             min-height: 0;
         }
 
@@ -69,7 +69,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 220px;
+            width: 240px;  /* Чуть шире для пропорций */
             height: 140px;
             max-width: 100%;
         }
@@ -86,14 +86,14 @@
             z-index: 2;
         }
 
-        /* Волны - несколько слоёв с более светлой границей */
+        /* Контейнер для волн - квадратный, чтобы круги были идеальными */
         .wave-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 100%;
-            height: 100%;
+            width: 140px;  /* Равно высоте логотипа для идеального круга */
+            height: 140px;
             z-index: 1;
         }
 
@@ -105,75 +105,41 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
             background: transparent;
             opacity: 0;
             pointer-events: none;
+            box-shadow: 0 0 15px rgba(255,255,255,0.1);
         }
 
-        /* Три волны с разной задержкой */
-        .wave-1 {
-            animation: wave-animation-1 1.2s ease-out infinite;
-        }
-
-        .wave-2 {
-            animation: wave-animation-2 1.2s ease-out infinite;
-        }
-
-        .wave-3 {
-            animation: wave-animation-3 1.2s ease-out infinite;
-        }
-
-        @keyframes wave-animation-1 {
-            0% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.6;
-                border-color: rgba(255,255,255,0.5);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(2.2);
-                opacity: 0;
-                border-color: rgba(255,255,255,0.8);
-            }
-        }
-
-        @keyframes wave-animation-2 {
-            0% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.6;
-                border-color: rgba(255,255,255,0.5);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(2.2);
-                opacity: 0;
-                border-color: rgba(255,255,255,0.8);
-            }
-        }
-
-        @keyframes wave-animation-3 {
-            0% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.6;
-                border-color: rgba(255,255,255,0.5);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(2.2);
-                opacity: 0;
-                border-color: rgba(255,255,255,0.8);
-            }
-        }
-
-        /* Класс для запуска анимации волн */
+        /* Класс для запуска анимации волн - последовательно */
         .waves-active .wave-1 {
-            animation: wave-animation-1 1.2s ease-out forwards;
+            animation: wave-animation 1.5s ease-out forwards;
         }
 
         .waves-active .wave-2 {
-            animation: wave-animation-2 1.2s ease-out 0.1s forwards;
+            animation: wave-animation 1.5s ease-out 0.2s forwards;
         }
 
         .waves-active .wave-3 {
-            animation: wave-animation-3 1.2s ease-out 0.2s forwards;
+            animation: wave-animation 1.5s ease-out 0.4s forwards;
+        }
+
+        @keyframes wave-animation {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+                border-color: rgba(255,255,255,0.3);
+            }
+            50% {
+                border-color: rgba(255,255,255,0.5);
+                opacity: 0.4;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2.5);
+                opacity: 0;
+                border-color: rgba(255,255,255,0.1);
+            }
         }
 
         /* Анимация пульсации для логотипа */
@@ -193,45 +159,46 @@
         /* Нижняя часть с контентом */
         .content-section {
             flex: 2;
-            padding: 0 16px 16px 16px;
+            padding: 0 16px 24px 16px;  /* Увеличен нижний отступ */
             width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
         }
 
-        /* Контейнер для всех кнопок и статуса */
+        /* Контейнер для всех кнопок и статуса - убрана граница */
         .actions-container {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 24px;
-            padding: 16px;
+            background: rgba(255,255,255,0.02);
+            border: none;  /* Убрана граница */
+            border-radius: 28px;
+            padding: 24px 20px;  /* Увеличены отступы */
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             width: 100%;
+            margin-bottom: 8px;
         }
 
-        /* Статус подписки (без заголовка) */
+        /* Статус подписки */
         .status-text {
             font-size: 16px;
             font-weight: 400;
             color: rgba(255,255,255,0.9);
-            line-height: 1.4;
+            line-height: 1.5;
             text-align: center;
-            padding: 8px 0 12px 0;
+            padding: 12px 0 16px 0;  /* Увеличены отступы */
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 12px;
+            margin-bottom: 20px;  /* Увеличен отступ */
         }
 
-        /* Кнопки - более компактные */
+        /* Кнопки - с увеличенными отступами */
         .button {
             display: block;
             width: 100%;
-            padding: 12px;
-            margin: 6px 0;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 14px;
-            font-size: 14px;
+            padding: 14px;
+            margin: 10px 0;  /* Увеличены отступы между кнопками */
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 16px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             text-align: center;
@@ -244,14 +211,14 @@
         }
 
         .button:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.08);
         }
 
         .button.secondary {
             border-color: rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.7);
-            font-size: 13px;
-            padding: 10px;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            padding: 12px;
         }
 
         /* Спиннер загрузки */
@@ -284,7 +251,7 @@
         h3 {
             font-size: 20px;
             font-weight: 500;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             color: #ffffff;
             letter-spacing: -0.5px;
         }
@@ -293,14 +260,14 @@
         .tariff-grid {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 10px;
         }
 
         .tariff-item {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 14px;
-            padding: 14px;
+            border-radius: 16px;
+            padding: 16px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
@@ -314,13 +281,13 @@
         }
 
         .tariff-name {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 500;
             color: #ffffff;
         }
 
         .tariff-price {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             color: #ffffff;
         }
@@ -329,7 +296,7 @@
         .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
+            padding: 14px 0;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -339,13 +306,13 @@
 
         .info-label {
             color: rgba(255,255,255,0.6);
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .info-value {
             color: #ffffff;
             font-weight: 500;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .link {
@@ -354,32 +321,32 @@
             text-decoration: underline;
             text-decoration-color: rgba(255,255,255,0.3);
             text-underline-offset: 4px;
-            font-size: 12px;
+            font-size: 13px;
         }
 
         /* Кнопка назад */
         .back-button {
-            margin-top: 12px;
+            margin-top: 16px;
         }
 
         /* Блок с ссылкой на подписку */
         .subscription-url-box {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
-            padding: 12px;
+            border-radius: 14px;
+            padding: 14px;
             word-break: break-all;
-            margin: 12px 0;
-            font-size: 12px;
+            margin: 16px 0;
+            font-size: 13px;
             color: rgba(255,255,255,0.9);
             font-family: monospace;
         }
 
         /* Подсказка об устройстве */
         #deviceHint {
-            font-size: 15px;
+            font-size: 16px;
             color: #ffffff;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             text-align: center;
         }
 
@@ -387,13 +354,13 @@
         .success-message {
             color: #ffffff;
             text-align: center;
-            padding: 8px;
+            padding: 10px;
             font-weight: 500;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 10px;
-            margin: 8px 0;
-            font-size: 12px;
+            border-radius: 12px;
+            margin: 12px 0;
+            font-size: 13px;
         }
 
         /* Анимации */
@@ -421,13 +388,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            margin-bottom: 16px;
+            gap: 8px;
+            margin-bottom: 20px;
         }
 
         .step {
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: transparent;
             border: 1.5px solid rgba(255,255,255,0.3);
@@ -436,7 +403,7 @@
             justify-content: center;
             font-weight: 500;
             color: rgba(255,255,255,0.6);
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .step.active {
@@ -449,12 +416,12 @@
             flex: 1;
             height: 1px;
             background: rgba(255,255,255,0.2);
-            max-width: 25px;
+            max-width: 30px;
         }
 
         /* Текстовые абзацы */
         p {
-            font-size: 13px;
+            font-size: 14px;
             line-height: 1.5;
         }
 
@@ -543,14 +510,14 @@
                     <div id="setupSteps" class="hidden">
                         <!-- Шаг 1 -->
                         <div id="step1" class="hidden">
-                            <p style="margin: 16px 0; color: rgba(255,255,255,0.8);">Установите приложение Happ</p>
+                            <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Установите приложение Happ</p>
                             <button class="button" onclick="installApp()">Установить</button>
                             <button class="button secondary" onclick="nextStep()">Далее →</button>
                         </div>
                         
                         <!-- Шаг 2 -->
                         <div id="step2" class="hidden">
-                            <p style="margin: 16px 0; color: rgba(255,255,255,0.8);">Добавьте подписку</p>
+                            <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Добавьте подписку</p>
                             <div id="subscriptionUrlDisplay" class="subscription-url-box">Ссылка загружается...</div>
                             <button class="button" onclick="addSubscriptionToHapp()">➕ Добавить подписку</button>
                             <div id="addStatus" class="success-message"></div>
@@ -559,7 +526,7 @@
                         
                         <!-- Шаг 3 -->
                         <div id="step3" class="hidden">
-                            <p style="margin: 16px 0; color: rgba(255,255,255,0.8);">Готово! Нажмите на круглую кнопку в приложении Happ</p>
+                            <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Готово! Нажмите на круглую кнопку в приложении Happ</p>
                             <button class="button" onclick="finishSetup()">Завершить настройку</button>
                         </div>
                     </div>
@@ -584,7 +551,7 @@
                 <!-- Экран реферальной программы -->
                 <div id="referralScreen" class="hidden">
                     <h3>Реферальная программа</h3>
-                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px; line-height: 1.5; font-size: 13px;">
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 24px; line-height: 1.6; font-size: 14px;">
                         За каждого приглашенного друга вы получите 15% бонусных дней от его пополнений.
                     </p>
                     <div id="referralInfo">Загрузка...</div>
@@ -645,7 +612,7 @@
             setTimeout(() => {
                 logo.classList.remove('logo-pulse');
                 waveContainer.classList.remove('waves-active');
-            }, 1200);
+            }, 1600);
         }
 
         // Запускаем пульсацию логотипа каждые 5 секунд
@@ -784,9 +751,9 @@
                 const data = await fetchWithAuth(API_URL + '/api/referral_info');
                 let html = `<div class="info-row"><span class="info-label">Приглашено друзей:</span> <span class="info-value">${data.count}</span></div>`;
                 html += `<div class="info-row"><span class="info-label">Ваша ссылка:</span> <span class="link">${data.link}</span></div>`;
-                html += `<h4 style="margin: 20px 0 12px; font-weight: 500;">История начислений</h4>`;
+                html += `<h4 style="margin: 24px 0 16px; font-weight: 500;">История начислений</h4>`;
                 if (data.history.length === 0) {
-                    html += '<p style="color: rgba(255,255,255,0.6); font-size: 13px;">Пока нет начислений</p>';
+                    html += '<p style="color: rgba(255,255,255,0.6); font-size: 14px;">Пока нет начислений</p>';
                 } else {
                     data.history.forEach(item => {
                         const date = new Date(item.created_at).toLocaleDateString();
@@ -805,7 +772,7 @@
                 const trans = await fetchWithAuth(API_URL + '/api/transactions');
                 let html = '';
                 if (trans.length === 0) {
-                    html = '<p style="color: rgba(255,255,255,0.6); font-size: 13px;">Пока нет покупок</p>';
+                    html = '<p style="color: rgba(255,255,255,0.6); font-size: 14px;">Пока нет покупок</p>';
                 } else {
                     trans.forEach(t => {
                         const date = new Date(t.created_at).toLocaleDateString();

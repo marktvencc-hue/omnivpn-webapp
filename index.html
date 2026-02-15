@@ -46,30 +46,46 @@
             overflow: hidden;
         }
 
-        /* Верхняя часть с логотипом - без ограничений */
-        .logo-container {
-            position: relative; /* Добавлено для позиционирования волн */
+        /* Контейнер для контента */
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Верхняя часть с логотипом */
+        .logo-section {
+            flex: 1.2;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px 20px 10px 20px;
-            flex: 0 0 auto; /* Не растягивается, занимает только нужное место */
+            padding: 16px;
+            min-height: 0;
+            position: relative;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .logo-image {
+            max-width: 220px;
             width: auto;
+            max-height: 140px;
             height: auto;
-            max-width: 90vw; /* Не шире 90% ширины экрана */
-            max-height: 40vh; /* Не выше 40% высоты экрана, но не сжимает, если меньше */
-            object-fit: scale-down; /* Масштабирует, но не обрезает */
+            object-fit: contain;
             filter: brightness(0) invert(1);
             transform-origin: center;
-            display: block; /* Убираем лишние отступы */
             position: relative;
             z-index: 2;
         }
 
-        /* Анимированные волны (серые круги) */
+        /* Волны */
         .wave {
             position: absolute;
             top: 50%;
@@ -78,7 +94,7 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.15);
             z-index: 1;
             opacity: 0;
             pointer-events: none;
@@ -87,25 +103,37 @@
         @keyframes wave-animation {
             0% {
                 transform: translate(-50%, -50%) scale(1);
-                opacity: 0.5;
+                opacity: 0.4;
             }
             100% {
-                transform: translate(-50%, -50%) scale(3);
+                transform: translate(-50%, -50%) scale(2.5);
                 opacity: 0;
             }
         }
 
-        .logo-pulse .wave {
+        .wave-active {
             animation: wave-animation 0.8s ease-out forwards;
         }
 
-        /* Контейнер для контента, прижатый к низу */
-        .bottom-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+        /* Анимация пульсации для логотипа */
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.08); }
+            60% { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
+
+        .logo-pulse {
+            animation: heartbeat 0.8s ease-in-out;
+        }
+
+        /* Нижняя часть с контентом */
+        .content-section {
+            flex: 2;
             padding: 0 16px 16px 16px;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -323,7 +351,7 @@
             }
         }
 
-        .bottom-container > div {
+        .content-section > div {
             animation: fadeIn 0.25s ease-out;
         }
 
@@ -368,129 +396,139 @@
             font-size: 13px;
             line-height: 1.5;
         }
+
+        /* Убираем скролл полностью */
+        .content-section {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
     </style>
 </head>
 <body>
     <div class="app">
-        <!-- Логотип отдельно - теперь с волнами -->
-        <div class="logo-container" id="logoWrapper">
-            <img src="https://drive.google.com/uc?export=view&id=1ESCJ2tJ1DKYR7tnXpqIa6fILYp0qzME4" alt="OmniVPN" class="logo-image" id="logoImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <div class="wave" id="wave"></div>
-            <div style="display: none; color: white; font-size: 32px; font-weight: 700; letter-spacing: 4px;">◉</div>
-        </div>
+        <div class="content-wrapper">
+            <!-- Верхняя часть с логотипом -->
+            <div class="logo-section">
+                <div class="logo-wrapper" id="logoWrapper">
+                    <img src="https://drive.google.com/uc?export=view&id=1ESCJ2tJ1DKYR7tnXpqIa6fILYp0qzME4" alt="OmniVPN" class="logo-image" id="logoImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="wave" id="wave"></div>
+                    <div style="display: none; color: white; font-size: 32px; font-weight: 700; letter-spacing: 4px;">◉</div>
+                </div>
+            </div>
 
-        <!-- Контейнер для контента, прижатый к низу -->
-        <div class="bottom-container">
-            <!-- Главный экран -->
-            <div id="mainScreen">
-                <div class="actions-container">
-                    <div id="statusText" class="status-text">
-                        <div class="loading-container">
-                            <span class="loader"></span>
-                            <span>Загрузка...</span>
+            <!-- Нижняя часть с контентом -->
+            <div class="content-section">
+                <!-- Главный экран -->
+                <div id="mainScreen">
+                    <div class="actions-container">
+                        <div id="statusText" class="status-text">
+                            <div class="loading-container">
+                                <span class="loader"></span>
+                                <span>Загрузка...</span>
+                            </div>
+                        </div>
+                        
+                        <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
+                        <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
+                        <button class="button" onclick="showProfile()">👤 Профиль</button>
+                    </div>
+                </div>
+
+                <!-- Экран тарифов -->
+                <div id="tariffsScreen" class="hidden">
+                    <h3>Выберите тариф</h3>
+                    <div class="tariff-grid">
+                        <div class="tariff-item" onclick="buyTariff('1month')">
+                            <span class="tariff-name">1 месяц</span>
+                            <span class="tariff-price">150 ⭐</span>
+                        </div>
+                        <div class="tariff-item" onclick="buyTariff('3months')">
+                            <span class="tariff-name">3 месяца</span>
+                            <span class="tariff-price">250 ⭐</span>
+                        </div>
+                        <div class="tariff-item" onclick="buyTariff('6months')">
+                            <span class="tariff-name">6 месяцев</span>
+                            <span class="tariff-price">350 ⭐</span>
+                        </div>
+                        <div class="tariff-item" onclick="buyTariff('1year')">
+                            <span class="tariff-name">1 год</span>
+                            <span class="tariff-price">500 ⭐</span>
+                        </div>
+                    </div>
+                    <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+                </div>
+
+                <!-- Экран настройки -->
+                <div id="setupScreen" class="hidden">
+                    <h3 id="deviceHint">Установка на устройство</h3>
+                    
+                    <div class="step-indicator">
+                        <div class="step" id="step1-indicator">1</div>
+                        <div class="step-line"></div>
+                        <div class="step" id="step2-indicator">2</div>
+                        <div class="step-line"></div>
+                        <div class="step" id="step3-indicator">3</div>
+                    </div>
+                    
+                    <button class="button" onclick="startSetup()">Начать настройку</button>
+                    
+                    <div id="setupSteps" class="hidden">
+                        <!-- Шаг 1 -->
+                        <div id="step1" class="hidden">
+                            <p style="margin: 16px 0; color: rgba(255,255,255,0.8);">Установите приложение Happ</p>
+                            <button class="button" onclick="installApp()">Установить</button>
+                            <button class="button secondary" onclick="nextStep()">Далее →</button>
+                        </div>
+                        
+                        <!-- Шаг 2 -->
+                        <div id="step2" class="hidden">
+                            <p style="margin: 16px 0; color: rgba(255,255,255,0.8);">Добавьте подписку</p>
+                            <div id="subscriptionUrlDisplay" class="subscription-url-box">Ссылка загружается...</div>
+                            <button class="button" onclick="addSubscriptionToHapp()">➕ Добавить подписку</button>
+                            <div id="addStatus" class="success-message"></div>
+                            <button class="button secondary" onclick="nextStep()">Далее →</button>
+                        </div>
+                        
+                        <!-- Шаг 3 -->
+                        <div id="step3" class="hidden">
+                            <p style="margin: 16px 0; color: rgba(255,255,255,0.8);">Готово! Нажмите на круглую кнопку в приложении Happ</p>
+                            <button class="button" onclick="finishSetup()">Завершить настройку</button>
                         </div>
                     </div>
                     
-                    <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
-                    <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
-                    <button class="button" onclick="showProfile()">👤 Профиль</button>
-                </div>
-            </div>
-
-            <!-- Экран тарифов -->
-            <div id="tariffsScreen" class="hidden">
-                <h3>Выберите тариф</h3>
-                <div class="tariff-grid">
-                    <div class="tariff-item" onclick="buyTariff('1month')">
-                        <span class="tariff-name">1 месяц</span>
-                        <span class="tariff-price">150 ⭐</span>
-                    </div>
-                    <div class="tariff-item" onclick="buyTariff('3months')">
-                        <span class="tariff-name">3 месяца</span>
-                        <span class="tariff-price">250 ⭐</span>
-                    </div>
-                    <div class="tariff-item" onclick="buyTariff('6months')">
-                        <span class="tariff-name">6 месяцев</span>
-                        <span class="tariff-price">350 ⭐</span>
-                    </div>
-                    <div class="tariff-item" onclick="buyTariff('1year')">
-                        <span class="tariff-name">1 год</span>
-                        <span class="tariff-price">500 ⭐</span>
-                    </div>
-                </div>
-                <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
-            </div>
-
-            <!-- Экран настройки -->
-            <div id="setupScreen" class="hidden">
-                <h3 id="deviceHint">Установка на устройство</h3>
-                
-                <div class="step-indicator">
-                    <div class="step" id="step1-indicator">1</div>
-                    <div class="step-line"></div>
-                    <div class="step" id="step2-indicator">2</div>
-                    <div class="step-line"></div>
-                    <div class="step" id="step3-indicator">3</div>
-                </div>
-                
-                <button class="button" onclick="startSetup()">Начать настройку</button>
-                
-                <div id="setupSteps" class="hidden">
-                    <!-- Шаг 1 -->
-                    <div id="step1" class="hidden">
-                        <p style="margin: 16px 0; color: rgba(255,255,255,0.8);">Установите приложение Happ</p>
-                        <button class="button" onclick="installApp()">Установить</button>
-                        <button class="button secondary" onclick="nextStep()">Далее →</button>
-                    </div>
-                    
-                    <!-- Шаг 2 -->
-                    <div id="step2" class="hidden">
-                        <p style="margin: 16px 0; color: rgba(255,255,255,0.8);">Добавьте подписку</p>
-                        <div id="subscriptionUrlDisplay" class="subscription-url-box">Ссылка загружается...</div>
-                        <button class="button" onclick="addSubscriptionToHapp()">➕ Добавить подписку</button>
-                        <div id="addStatus" class="success-message"></div>
-                        <button class="button secondary" onclick="nextStep()">Далее →</button>
-                    </div>
-                    
-                    <!-- Шаг 3 -->
-                    <div id="step3" class="hidden">
-                        <p style="margin: 16px 0; color: rgba(255,255,255,0.8);">Готово! Нажмите на круглую кнопку в приложении Happ</p>
-                        <button class="button" onclick="finishSetup()">Завершить настройку</button>
-                    </div>
-                </div>
-                
-                <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
-            </div>
-
-            <!-- Экран профиля -->
-            <div id="profileScreen" class="hidden">
-                <h3>Профиль</h3>
-                
-                <div class="actions-container">
-                    <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
-                    <button class="button" onclick="openSupport()">🆘 Связаться с поддержкой</button>
-                    <button class="button" onclick="showTransactions()">📜 Мои транзакции</button>
-                    <button class="button" onclick="openAgreement()">📄 Пользовательское соглашение</button>
-                    
                     <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
                 </div>
-            </div>
 
-            <!-- Экран реферальной программы -->
-            <div id="referralScreen" class="hidden">
-                <h3>Реферальная программа</h3>
-                <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px; line-height: 1.5; font-size: 13px;">
-                    За каждого приглашенного друга вы получите 15% бонусных дней от его пополнений.
-                </p>
-                <div id="referralInfo">Загрузка...</div>
-                <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
-            </div>
+                <!-- Экран профиля -->
+                <div id="profileScreen" class="hidden">
+                    <h3>Профиль</h3>
+                    
+                    <div class="actions-container">
+                        <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
+                        <button class="button" onclick="openSupport()">🆘 Связаться с поддержкой</button>
+                        <button class="button" onclick="showTransactions()">📜 Мои транзакции</button>
+                        <button class="button" onclick="openAgreement()">📄 Пользовательское соглашение</button>
+                        
+                        <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+                    </div>
+                </div>
 
-            <!-- Экран транзакций -->
-            <div id="transactionsScreen" class="hidden">
-                <h3>История транзакций</h3>
-                <div id="transactionsList">Загрузка...</div>
-                <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
+                <!-- Экран реферальной программы -->
+                <div id="referralScreen" class="hidden">
+                    <h3>Реферальная программа</h3>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px; line-height: 1.5; font-size: 13px;">
+                        За каждого приглашенного друга вы получите 15% бонусных дней от его пополнений.
+                    </p>
+                    <div id="referralInfo">Загрузка...</div>
+                    <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
+                </div>
+
+                <!-- Экран транзакций -->
+                <div id="transactionsScreen" class="hidden">
+                    <h3>История транзакций</h3>
+                    <div id="transactionsList">Загрузка...</div>
+                    <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
+                </div>
             </div>
         </div>
     </div>
@@ -528,26 +566,25 @@
         let currentStep = 1;
         let currentSubscriptionUrl = '';
 
-        // Функция для пульсации логотипа с волнами
+        // Функция для пульсации логотипа и волн
         function pulseLogo() {
             const logo = document.getElementById('logoImage');
-            const wrapper = document.getElementById('logoWrapper');
+            const wave = document.getElementById('wave');
             
-            // Добавляем класс анимации
             logo.classList.add('logo-pulse');
-            wrapper.classList.add('logo-pulse');
+            wave.classList.add('wave-active');
             
             setTimeout(() => {
                 logo.classList.remove('logo-pulse');
-                wrapper.classList.remove('logo-pulse');
+                wave.classList.remove('wave-active');
             }, 800);
         }
 
-        // Запускаем пульсацию каждые 5 секунд
-        setInterval(pulseLogo, 5000);
+        // Запускаем пульсацию логотипа каждые 30 секунд
+        setInterval(pulseLogo, 30000);
 
-        // Первая пульсация через 2 секунды после загрузки
-        setTimeout(pulseLogo, 2000);
+        // Первая пульсация через 5 секунд после загрузки
+        setTimeout(pulseLogo, 5000);
 
         // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
         async function fetchWithAuth(url, options = {}) {
@@ -576,7 +613,7 @@
             document.getElementById(screenId).classList.remove('hidden');
             
             // Сбрасываем прокрутку
-            document.querySelector('.bottom-container').scrollTop = 0;
+            document.querySelector('.content-section').scrollTop = 0;
         }
 
         function backToMain() {

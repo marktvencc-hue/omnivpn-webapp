@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -17,11 +17,13 @@
             background: #000000;
             color: #ffffff;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
 
-        /* Градиентный фон с эффектом глубины */
+        /* Градиентный фон */
         body::before {
             content: '';
             position: fixed;
@@ -38,17 +40,24 @@
         .app {
             position: relative;
             z-index: 1;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
 
-        /* Шапка */
+        .app::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Шапка с логотипом */
         .header {
             height: 72px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             padding: 0 20px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
@@ -59,27 +68,31 @@
             z-index: 10;
         }
 
-        .header-title {
-            font-size: 20px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .header-logo {
+        .logo-icon {
             width: 40px;
             height: 40px;
+            background: #ffffff;
             border-radius: 12px;
-            background: rgba(255,255,255,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            font-size: 18px;
-            border: 1px solid rgba(255,255,255,0.2);
+            color: #000000;
+            font-weight: 700;
+            font-size: 24px;
+            transform: rotate(45deg);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #ffffff;
         }
 
         /* Основной контейнер */
@@ -93,18 +106,12 @@
         /* Карточка статуса */
         .status-card {
             background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 24px;
             padding: 24px;
             margin-bottom: 24px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            transition: transform 0.2s, border-color 0.2s;
-        }
-
-        .status-card:hover {
-            border-color: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
         }
 
         .status-label {
@@ -122,62 +129,43 @@
             line-height: 1.5;
         }
 
-        /* Кнопки */
+        /* Кнопки - прозрачный фон с белой границей */
         .button {
             display: block;
             width: 100%;
-            padding: 18px;
-            margin: 12px 0;
-            border: none;
+            padding: 16px;
+            margin: 10px 0;
+            border: 1.5px solid #ffffff;
             border-radius: 16px;
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
             text-align: center;
             transition: all 0.2s;
-            background: #ffffff;
-            color: #000000;
-            letter-spacing: 0.3px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.1);
-            transform: translate(-50%, -50%);
-            transition: width 0.4s, height 0.4s;
-        }
-
-        .button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .button.secondary {
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
             color: #ffffff;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
 
-        .button.secondary:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.5);
-        }
-
-        .button:active {
+        .button:hover {
+            background: rgba(255,255,255,0.1);
             transform: scale(0.98);
         }
 
-        .button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .button.secondary {
+            border-color: rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.8);
+        }
+
+        .button.secondary:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+        }
+
+        .button:active {
+            transform: scale(0.97);
         }
 
         /* Заголовки экранов */
@@ -198,7 +186,7 @@
 
         .tariff-item {
             background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 20px;
             padding: 20px;
             cursor: pointer;
@@ -210,13 +198,8 @@
 
         .tariff-item:hover {
             background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.2);
-            transform: translateX(4px);
-        }
-
-        .tariff-item.selected {
             border-color: #ffffff;
-            background: rgba(255,255,255,0.1);
+            transform: translateX(4px);
         }
 
         .tariff-name {
@@ -268,14 +251,12 @@
         /* Кнопка назад */
         .back-button {
             margin-top: 24px;
-            border: 1px solid rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.8);
         }
 
         /* Блок с ссылкой на подписку */
         .subscription-url-box {
             background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 16px;
             padding: 16px;
             word-break: break-all;
@@ -288,7 +269,7 @@
         /* Подсказка об устройстве */
         #deviceHint {
             font-size: 18px;
-            color: rgba(255,255,255,0.9);
+            color: #ffffff;
             margin-bottom: 12px;
         }
 
@@ -299,6 +280,7 @@
             padding: 12px;
             font-weight: 500;
             background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 12px;
             margin: 12px 0;
         }
@@ -323,20 +305,6 @@
             animation: fadeIn 0.3s ease-out;
         }
 
-        /* Панель отладки */
-        .debug-log {
-            background: #111111;
-            color: #ffffff;
-            padding: 12px;
-            border-radius: 12px;
-            margin: 20px;
-            font-family: monospace;
-            font-size: 12px;
-            max-height: 200px;
-            overflow: auto;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
         /* Шаги настройки */
         .step-indicator {
             display: flex;
@@ -350,8 +318,8 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -360,9 +328,9 @@
         }
 
         .step.active {
-            background: #ffffff;
-            color: #000000;
             border-color: #ffffff;
+            color: #ffffff;
+            background: transparent;
         }
 
         .step-line {
@@ -371,17 +339,39 @@
             background: rgba(255,255,255,0.2);
             max-width: 40px;
         }
+
+        /* Ссылки для установки */
+        .install-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .install-link {
+            display: block;
+            padding: 16px;
+            border: 1.5px solid rgba(255,255,255,0.3);
+            border-radius: 16px;
+            text-decoration: none;
+            color: #ffffff;
+            transition: all 0.2s;
+        }
+
+        .install-link:hover {
+            border-color: #ffffff;
+            background: rgba(255,255,255,0.05);
+        }
     </style>
 </head>
 <body>
     <div class="app">
         <div class="header">
-            <div class="header-title">OMNIVPN</div>
-            <div class="header-logo">◉</div>
+            <div class="logo">
+                <div class="logo-icon">◉</div>
+                <span class="logo-text">OMNIVPN</span>
+            </div>
         </div>
-        
-        <!-- Панель отладки -->
-        <div id="debugPanel" class="debug-log"></div>
 
         <!-- Главный экран -->
         <div class="container" id="mainScreen">
@@ -390,17 +380,9 @@
                 <div class="status-value" id="statusText">Загрузка...</div>
             </div>
             
-            <button class="button" onclick="showTariffs()">
-                <span>💰</span> Купить подписку
-            </button>
-            
-            <button class="button" onclick="showSetup()">
-                <span>🔧</span> Установка и настройка
-            </button>
-            
-            <button class="button" onclick="showProfile()">
-                <span>👤</span> Профиль
-            </button>
+            <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
+            <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
+            <button class="button" onclick="showProfile()">👤 Профиль</button>
         </div>
 
         <!-- Экран тарифов -->
@@ -472,21 +454,10 @@
         <div class="container hidden" id="profileScreen">
             <h3>Профиль</h3>
             
-            <button class="button" onclick="showReferral()">
-                <span>🎁</span> Реферальная программа
-            </button>
-            
-            <button class="button" onclick="openSupport()">
-                <span>🆘</span> Связаться с поддержкой
-            </button>
-            
-            <button class="button" onclick="showTransactions()">
-                <span>📜</span> Мои транзакции
-            </button>
-            
-            <button class="button" onclick="openAgreement()">
-                <span>📄</span> Пользовательское соглашение
-            </button>
+            <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
+            <button class="button" onclick="openSupport()">🆘 Связаться с поддержкой</button>
+            <button class="button" onclick="showTransactions()">📜 Мои транзакции</button>
+            <button class="button" onclick="openAgreement()">📄 Пользовательское соглашение</button>
             
             <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
         </div>
@@ -509,11 +480,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
-        // Инициализация Eruda
-        eruda.init();
-        
         // ---------- НАСТРОЙКИ ----------
         const API_URL = 'https://omnivpn.us.ci';
         const SUPPORT_BOT_USERNAME = 'SupportBot';
@@ -546,17 +513,38 @@
         let currentStep = 1;
         let currentSubscriptionUrl = '';
 
-        // Функция для отладки
-        function logDebug(message, data) {
-            const debugPanel = document.getElementById('debugPanel');
-            const timestamp = new Date().toLocaleTimeString();
-            const logLine = `[${timestamp}] ${message}: ${JSON.stringify(data, null, 2)}\n`;
-            console.log(logLine);
-            if (debugPanel) {
-                debugPanel.style.display = 'block';
-                debugPanel.innerHTML += logLine;
-                debugPanel.scrollTop = debugPanel.scrollHeight;
+        // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
+        async function fetchWithAuth(url, options = {}) {
+            options.headers = {
+                ...options.headers,
+                'X-Telegram-Init-Data': tg.initData || ''
+            };
+            
+            const response = await fetch(url, options);
+            
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.error || `HTTP ${response.status}`);
             }
+            
+            return response.json();
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+            document.getElementById(screenId).classList.remove('hidden');
+            
+            // Прокрутка вверх при смене экрана
+            document.querySelector('.app').scrollTop = 0;
+        }
+
+        function backToMain() {
+            showScreen('mainScreen');
+            loadStatus();
+        }
+
+        function backToProfile() {
+            showScreen('profileScreen');
         }
 
         // Обновление индикаторов шагов
@@ -568,62 +556,6 @@
                     el.classList.remove('active');
                 }
             });
-        }
-
-        // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
-        async function fetchWithAuth(url, options = {}) {
-            logDebug('initData exists', !!tg.initData);
-            logDebug('initData (first 100)', tg.initData?.substring(0, 100) || 'empty');
-            
-            options.headers = {
-                ...options.headers,
-                'X-Telegram-Init-Data': tg.initData || ''
-            };
-            
-            logDebug('Request URL', url);
-            logDebug('Request headers', options.headers);
-            
-            try {
-                const response = await fetch(url, options);
-                logDebug('Response status', response.status);
-                logDebug('Response headers', Object.fromEntries(response.headers));
-                
-                const text = await response.text();
-                logDebug('Response text', text);
-                
-                if (!response.ok) {
-                    let error;
-                    try {
-                        error = JSON.parse(text);
-                    } catch {
-                        error = { error: text };
-                    }
-                    throw new Error(error.error || `HTTP ${response.status}`);
-                }
-                
-                try {
-                    return JSON.parse(text);
-                } catch {
-                    return text;
-                }
-            } catch (e) {
-                logDebug('Fetch error', e.message);
-                throw e;
-            }
-        }
-
-        function showScreen(screenId) {
-            document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
-            document.getElementById(screenId).classList.remove('hidden');
-        }
-
-        function backToMain() {
-            showScreen('mainScreen');
-            loadStatus();
-        }
-
-        function backToProfile() {
-            showScreen('profileScreen');
         }
 
         // ---------- ЗАГРУЗКА СТАТУСА ----------

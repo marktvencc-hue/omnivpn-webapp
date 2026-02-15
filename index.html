@@ -79,10 +79,26 @@
             margin: 10px 0;
             font-size: 14px;
         }
+        .debug-log {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow: auto;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="header">OmniVPN</div>
+    
+    <!-- Панель отладки (будет видна только при включении) -->
+    <div id="debugPanel" class="debug-log"></div>
+
     <div class="container" id="mainScreen">
         <div class="status-card" id="statusText">Загрузка...</div>
         <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
@@ -145,11 +161,22 @@
         <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
     </div>
 
+    <!-- Eruda консоль для отладки в Telegram -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
+        // Инициализация Eruda (появится кнопка в углу экрана)
+        eruda.init();
+        
         // ---------- НАСТРОЙКИ ----------
         const API_URL = 'https://omnivpn.us.ci';  // ⚠️ замените на ваш домен с HTTPS
         const SUPPORT_BOT_USERNAME = 'SupportBot';
         const USER_AGREEMENT_URL = 'https://telegra.ph/User-Agreement';
+
+        // Проверка наличия Telegram WebApp
+        if (!window.Telegram || !window.Telegram.WebApp) {
+            document.body.innerHTML = '<div style="padding: 20px; text-align: center; color: red;">❌ Ошибка: это приложение должно быть открыто через Telegram. Нажмите кнопку "Открыть приложение" в боте.</div>';
+            throw new Error('Not in Telegram');
+        }
 
         const tg = window.Telegram.WebApp;
         tg.ready();
@@ -158,18 +185,59 @@
         let currentStep = 1;
         let currentSubscriptionUrl = '';
 
+        // Функция для отладки
+        function logDebug(message, data) {
+            const debugPanel = document.getElementById('debugPanel');
+            const timestamp = new Date().toLocaleTimeString();
+            const logLine = `[${timestamp}] ${message}: ${JSON.stringify(data, null, 2)}\n`;
+            console.log(logLine);
+            if (debugPanel) {
+                debugPanel.style.display = 'block';
+                debugPanel.innerHTML += logLine;
+                debugPanel.scrollTop = debugPanel.scrollHeight;
+            }
+        }
+
         // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
         async function fetchWithAuth(url, options = {}) {
+            logDebug('initData exists', !!tg.initData);
+            logDebug('initData (first 100)', tg.initData?.substring(0, 100) || 'empty');
+            
             options.headers = {
                 ...options.headers,
-                'X-Telegram-Init-Data': tg.initData
+                'X-Telegram-Init-Data': tg.initData || ''
             };
-            const response = await fetch(url, options);
-            if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
-                throw new Error(error.error || `HTTP ${response.status}`);
+            
+            logDebug('Request URL', url);
+            logDebug('Request headers', options.headers);
+            
+            try {
+                const response = await fetch(url, options);
+                logDebug('Response status', response.status);
+                logDebug('Response headers', Object.fromEntries(response.headers));
+                
+                const text = await response.text();
+                logDebug('Response text', text);
+                
+                if (!response.ok) {
+                    let error;
+                    try {
+                        error = JSON.parse(text);
+                    } catch {
+                        error = { error: text };
+                    }
+                    throw new Error(error.error || `HTTP ${response.status}`);
+                }
+                
+                try {
+                    return JSON.parse(text);
+                } catch {
+                    return text;
+                }
+            } catch (e) {
+                logDebug('Fetch error', e.message);
+                throw e;
             }
-            return response.json();
         }
 
         function showScreen(screenId) {
@@ -191,20 +259,22 @@
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
                 const statusEl = document.getElementById('statusText');
+                
                 if (data.subscription_end) {
                     const date = new Date(data.subscription_end);
                     statusEl.innerText = `Подписка активна до ${date.toLocaleDateString()}`;
                 } else {
                     statusEl.innerText = 'Подписка не активирована. Пробный период 3 дня.';
                 }
+                
                 currentSubscriptionUrl = data.subscription_url || '';
-                // Обновим отображение ссылки, если уже на шаге 2
+                
                 const urlDisplay = document.getElementById('subscriptionUrlDisplay');
                 if (urlDisplay) {
                     urlDisplay.innerText = currentSubscriptionUrl || 'Ссылка не получена';
                 }
             } catch (e) {
-                document.getElementById('statusText').innerText = 'Ошибка загрузки статуса';
+                document.getElementById('statusText').innerText = 'Ошибка загрузки статуса: ' + e.message;
             }
         }
 
@@ -270,7 +340,7 @@
                 }
                 document.getElementById('referralInfo').innerHTML = html;
             } catch (e) {
-                document.getElementById('referralInfo').innerText = 'Ошибка загрузки';
+                document.getElementById('referralInfo').innerText = 'Ошибка загрузки: ' + e.message;
             }
         }
 
@@ -289,7 +359,7 @@
                 }
                 document.getElementById('transactionsList').innerHTML = html;
             } catch (e) {
-                document.getElementById('transactionsList').innerText = 'Ошибка загрузки';
+                document.getElementById('transactionsList').innerText = 'Ошибка загрузки: ' + e.message;
             }
         }
 

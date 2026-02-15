@@ -50,6 +50,10 @@
             border: 1px solid var(--tg-theme-button-color, #2481cc);
             color: var(--tg-theme-button-color, #2481cc);
         }
+        .button.success {
+            background: #28a745;
+            color: white;
+        }
         .hidden {
             display: none;
         }
@@ -71,34 +75,16 @@
         .back-button {
             margin-top: 20px;
         }
-        .subscription-url-box {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+        .success-message {
+            color: #28a745;
+            text-align: center;
             padding: 10px;
-            border-radius: 8px;
-            word-break: break-all;
-            margin: 10px 0;
-            font-size: 14px;
-        }
-        .debug-log {
-            background: #000;
-            color: #0f0;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            font-family: monospace;
-            font-size: 12px;
-            max-height: 200px;
-            overflow: auto;
-            display: none;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
     <div class="header">OmniVPN</div>
-    
-    <!-- Панель отладки (будет видна только при включении) -->
-    <div id="debugPanel" class="debug-log"></div>
-
     <div class="container" id="mainScreen">
         <div class="status-card" id="statusText">Загрузка...</div>
         <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
@@ -125,12 +111,16 @@
             <p>Шаг 1. Установите приложение Happ</p>
             <button class="button" id="installButton" onclick="installApp()">Установить</button>
             <button class="button secondary" onclick="nextStep()">Далее</button>
+            
             <p class="hidden" id="step2">
                 Шаг 2. Добавьте подписку в приложение Happ<br>
-                <div id="subscriptionUrlDisplay" class="subscription-url-box">Ссылка загружается...</div>
-                <button class="button" onclick="copySubscriptionUrl()">📋 Скопировать ссылку</button>
+                <button class="button success" id="addSubscriptionBtn" onclick="addSubscriptionToHapp()">
+                    ➕ Добавить подписку
+                </button>
+                <div id="addStatus" class="success-message"></div>
                 <button class="button secondary" onclick="nextStep()">Далее →</button>
             </p>
+            
             <p class="hidden" id="step3">
                 Шаг 3. Готово! Нажмите на круглую кнопку в приложении Happ
                 <button class="button" onclick="finishSetup()">Завершить настройку</button>
@@ -161,16 +151,23 @@
         <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
     </div>
 
-    <!-- Eruda консоль для отладки в Telegram -->
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
-        // Инициализация Eruda (появится кнопка в углу экрана)
-        eruda.init();
-        
         // ---------- НАСТРОЙКИ ----------
-        const API_URL = 'https://omnivpn.us.ci';  // ⚠️ замените на ваш домен с HTTPS
+        const API_URL = 'https://omnivpn.us.ci';
         const SUPPORT_BOT_USERNAME = 'SupportBot';
         const USER_AGREEMENT_URL = 'https://telegra.ph/User-Agreement';
+
+        // Ссылки на приложение по платформам
+        const APP_LINKS = {
+            android: 'https://play.google.com/store/apps/details?id=com.happproxy',
+            ios: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973',
+            ipados: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973',
+            windows: 'https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe',
+            macos: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973',
+            linux: 'https://github.com/Happ-proxy/happ-desktop/releases/latest/download/Happ.linux.x64.deb',
+            android_tv: 'https://play.google.com/store/apps/details?id=com.happproxy',
+            apple_tv: 'https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274'
+        };
 
         // Проверка наличия Telegram WebApp
         if (!window.Telegram || !window.Telegram.WebApp) {
@@ -185,59 +182,18 @@
         let currentStep = 1;
         let currentSubscriptionUrl = '';
 
-        // Функция для отладки
-        function logDebug(message, data) {
-            const debugPanel = document.getElementById('debugPanel');
-            const timestamp = new Date().toLocaleTimeString();
-            const logLine = `[${timestamp}] ${message}: ${JSON.stringify(data, null, 2)}\n`;
-            console.log(logLine);
-            if (debugPanel) {
-                debugPanel.style.display = 'block';
-                debugPanel.innerHTML += logLine;
-                debugPanel.scrollTop = debugPanel.scrollHeight;
-            }
-        }
-
         // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
         async function fetchWithAuth(url, options = {}) {
-            logDebug('initData exists', !!tg.initData);
-            logDebug('initData (first 100)', tg.initData?.substring(0, 100) || 'empty');
-            
             options.headers = {
                 ...options.headers,
-                'X-Telegram-Init-Data': tg.initData || ''
+                'X-Telegram-Init-Data': tg.initData
             };
-            
-            logDebug('Request URL', url);
-            logDebug('Request headers', options.headers);
-            
-            try {
-                const response = await fetch(url, options);
-                logDebug('Response status', response.status);
-                logDebug('Response headers', Object.fromEntries(response.headers));
-                
-                const text = await response.text();
-                logDebug('Response text', text);
-                
-                if (!response.ok) {
-                    let error;
-                    try {
-                        error = JSON.parse(text);
-                    } catch {
-                        error = { error: text };
-                    }
-                    throw new Error(error.error || `HTTP ${response.status}`);
-                }
-                
-                try {
-                    return JSON.parse(text);
-                } catch {
-                    return text;
-                }
-            } catch (e) {
-                logDebug('Fetch error', e.message);
-                throw e;
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.error || `HTTP ${response.status}`);
             }
+            return response.json();
         }
 
         function showScreen(screenId) {
@@ -259,22 +215,15 @@
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
                 const statusEl = document.getElementById('statusText');
-                
                 if (data.subscription_end) {
                     const date = new Date(data.subscription_end);
                     statusEl.innerText = `Подписка активна до ${date.toLocaleDateString()}`;
                 } else {
                     statusEl.innerText = 'Подписка не активирована. Пробный период 3 дня.';
                 }
-                
                 currentSubscriptionUrl = data.subscription_url || '';
-                
-                const urlDisplay = document.getElementById('subscriptionUrlDisplay');
-                if (urlDisplay) {
-                    urlDisplay.innerText = currentSubscriptionUrl || 'Ссылка не получена';
-                }
             } catch (e) {
-                document.getElementById('statusText').innerText = 'Ошибка загрузки статуса: ' + e.message;
+                document.getElementById('statusText').innerText = 'Ошибка загрузки статуса';
             }
         }
 
@@ -292,6 +241,7 @@
             const platform = tg.platform || 'unknown';
             document.getElementById('deviceHint').innerText = `Установка на ${platform}`;
             document.getElementById('setupSteps').classList.add('hidden');
+            document.getElementById('addStatus').innerText = '';
             currentStep = 1;
         }
 
@@ -340,7 +290,7 @@
                 }
                 document.getElementById('referralInfo').innerHTML = html;
             } catch (e) {
-                document.getElementById('referralInfo').innerText = 'Ошибка загрузки: ' + e.message;
+                document.getElementById('referralInfo').innerText = 'Ошибка загрузки';
             }
         }
 
@@ -359,7 +309,7 @@
                 }
                 document.getElementById('transactionsList').innerHTML = html;
             } catch (e) {
-                document.getElementById('transactionsList').innerText = 'Ошибка загрузки: ' + e.message;
+                document.getElementById('transactionsList').innerText = 'Ошибка загрузки';
             }
         }
 
@@ -370,41 +320,45 @@
 
         function installApp() {
             const platform = tg.platform;
-            let url = '';
-            if (platform.includes('android')) {
-                url = 'https://play.google.com/store/apps/details?id=org.happ.app';
-            } else if (platform.includes('ios')) {
-                url = 'https://apps.apple.com/app/happ';
-            } else if (platform.includes('windows')) {
-                url = 'https://github.com/happ/releases/latest';
-            } else if (platform.includes('macos')) {
-                url = 'https://apps.apple.com/app/happ';
-            } else {
-                url = 'https://github.com/happ/releases/latest';
-            }
+            let url = APP_LINKS[platform] || APP_LINKS.android;
             tg.openLink(url);
+        }
+
+        async function addSubscriptionToHapp() {
+            const addBtn = document.getElementById('addSubscriptionBtn');
+            const addStatus = document.getElementById('addStatus');
+            
+            if (!currentSubscriptionUrl) {
+                addStatus.innerText = '❌ Ссылка на подписку не получена';
+                return;
+            }
+
+            addBtn.disabled = true;
+            addBtn.innerText = '⏳ Добавление...';
+            
+            try {
+                // Пробуем открыть ссылку в приложении Happ
+                tg.openLink(currentSubscriptionUrl, { try_instant_view: false });
+                addStatus.innerText = '✅ Подписка добавлена! Перейдите в приложение Happ для активации.';
+                
+                // Автоматически переходим к шагу 3 через 2 секунды
+                setTimeout(() => {
+                    nextStep();
+                }, 2000);
+            } catch (e) {
+                addStatus.innerText = '❌ Ошибка: ' + e.message;
+                addBtn.disabled = false;
+                addBtn.innerText = '➕ Добавить подписку';
+            }
         }
 
         function nextStep() {
             if (currentStep === 1) {
                 document.getElementById('step2').classList.remove('hidden');
-                document.getElementById('subscriptionUrlDisplay').innerText = currentSubscriptionUrl || 'Ссылка не получена';
                 currentStep = 2;
             } else if (currentStep === 2) {
                 document.getElementById('step3').classList.remove('hidden');
                 currentStep = 3;
-            }
-        }
-
-        function copySubscriptionUrl() {
-            if (currentSubscriptionUrl) {
-                navigator.clipboard.writeText(currentSubscriptionUrl).then(() => {
-                    alert('Ссылка скопирована!');
-                }).catch(() => {
-                    alert('Не удалось скопировать');
-                });
-            } else {
-                alert('Ссылка ещё не готова');
             }
         }
 

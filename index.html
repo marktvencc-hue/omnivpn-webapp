@@ -71,6 +71,14 @@
         .back-button {
             margin-top: 20px;
         }
+        .subscription-url-box {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            padding: 10px;
+            border-radius: 8px;
+            word-break: break-all;
+            margin: 10px 0;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -103,11 +111,9 @@
             <button class="button secondary" onclick="nextStep()">Далее</button>
             <p class="hidden" id="step2">
                 Шаг 2. Добавьте подписку в приложение Happ<br>
-                Выберите протокол:
-                <button class="button" onclick="addSubscription('vless')">VLESS</button>
-                <button class="button" onclick="addSubscription('vmess')">VMESS</button>
-                <button class="button" onclick="addSubscription('snowflake')">Snowflake</button>
-                <button class="button secondary" onclick="nextStep()">Далее</button>
+                <div id="subscriptionUrlDisplay" class="subscription-url-box">Ссылка загружается...</div>
+                <button class="button" onclick="copySubscriptionUrl()">📋 Скопировать ссылку</button>
+                <button class="button secondary" onclick="nextStep()">Далее →</button>
             </p>
             <p class="hidden" id="step3">
                 Шаг 3. Готово! Нажмите на круглую кнопку в приложении Happ
@@ -141,15 +147,16 @@
 
     <script>
         // ---------- НАСТРОЙКИ ----------
-        const API_URL = 'https://omnivpn.us.ci'; // ⚠️ замените на ваш сервер
-        const SUPPORT_BOT_USERNAME = 'SupportBot';   // ⚠️ username бота поддержки (без @)
-        const USER_AGREEMENT_URL = 'https://telegra.ph/User-Agreement'; // ссылка на соглашение
+        const API_URL = 'https://omnivpn.us.ci';  // ⚠️ замените на ваш домен с HTTPS
+        const SUPPORT_BOT_USERNAME = 'SupportBot';
+        const USER_AGREEMENT_URL = 'https://telegra.ph/User-Agreement';
 
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
 
-        let currentStep = 1; // для настройки
+        let currentStep = 1;
+        let currentSubscriptionUrl = '';
 
         // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
         async function fetchWithAuth(url, options = {}) {
@@ -179,7 +186,7 @@
             showScreen('profileScreen');
         }
 
-        // ---------- ЗАГРУЗКА СТАТУСА НА ГЛАВНОЙ ----------
+        // ---------- ЗАГРУЗКА СТАТУСА ----------
         async function loadStatus() {
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
@@ -189,6 +196,12 @@
                     statusEl.innerText = `Подписка активна до ${date.toLocaleDateString()}`;
                 } else {
                     statusEl.innerText = 'Подписка не активирована. Пробный период 3 дня.';
+                }
+                currentSubscriptionUrl = data.subscription_url || '';
+                // Обновим отображение ссылки, если уже на шаге 2
+                const urlDisplay = document.getElementById('subscriptionUrlDisplay');
+                if (urlDisplay) {
+                    urlDisplay.innerText = currentSubscriptionUrl || 'Ссылка не получена';
                 }
             } catch (e) {
                 document.getElementById('statusText').innerText = 'Ошибка загрузки статуса';
@@ -286,7 +299,6 @@
         }
 
         function installApp() {
-            // Определяем платформу и открываем ссылку на магазин
             const platform = tg.platform;
             let url = '';
             if (platform.includes('android')) {
@@ -306,6 +318,7 @@
         function nextStep() {
             if (currentStep === 1) {
                 document.getElementById('step2').classList.remove('hidden');
+                document.getElementById('subscriptionUrlDisplay').innerText = currentSubscriptionUrl || 'Ссылка не получена';
                 currentStep = 2;
             } else if (currentStep === 2) {
                 document.getElementById('step3').classList.remove('hidden');
@@ -313,20 +326,15 @@
             }
         }
 
-        async function addSubscription(protocol) {
-            try {
-                const data = await fetchWithAuth(API_URL + '/api/add_subscription', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ protocol })
+        function copySubscriptionUrl() {
+            if (currentSubscriptionUrl) {
+                navigator.clipboard.writeText(currentSubscriptionUrl).then(() => {
+                    alert('Ссылка скопирована!');
+                }).catch(() => {
+                    alert('Не удалось скопировать');
                 });
-                if (data.subscription_url) {
-                    alert('Подписка добавлена! Скопируйте ссылку в приложение Happ: ' + data.subscription_url);
-                } else {
-                    alert('Ошибка добавления подписки');
-                }
-            } catch (e) {
-                alert('Ошибка: ' + e.message);
+            } else {
+                alert('Ссылка ещё не готова');
             }
         }
 
@@ -334,7 +342,7 @@
             backToMain();
         }
 
-        // ---------- ПРОФИЛЬ: ПОДДЕРЖКА И СОГЛАШЕНИЕ ----------
+        // ---------- ПРОФИЛЬ ----------
         function openSupport() {
             tg.openTelegramLink('https://t.me/' + SUPPORT_BOT_USERNAME);
         }
@@ -343,9 +351,8 @@
             tg.openLink(USER_AGREEMENT_URL);
         }
 
-        // ---------- ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ----------
+        // ---------- ИНИЦИАЛИЗАЦИЯ ----------
         loadStatus();
     </script>
 </body>
 </html>
-

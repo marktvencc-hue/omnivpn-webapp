@@ -57,20 +57,20 @@
 
         /* Верхняя часть с логотипом */
         .logo-section {
-            flex: 1.2;
+            flex: 1.5; /* Увеличил, чтобы дать больше места вертикальному логотипу */
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 10px;
             min-height: 0;
         }
 
         .logo-image {
-            max-width: 220px;
+            max-width: 90%; /* Ограничиваем по ширине, но не по высоте */
+            max-height: 90%; /* Ограничиваем по высоте, но не по ширине */
             width: auto;
-            max-height: 140px;
             height: auto;
-            object-fit: contain;
+            object-fit: contain; /* Сохраняем пропорции */
             filter: brightness(0) invert(1);
             transform-origin: center;
         }
@@ -78,9 +78,9 @@
         /* Анимация пульсации для логотипа */
         @keyframes heartbeat {
             0% { transform: scale(1); }
-            15% { transform: scale(1.15); }
+            15% { transform: scale(1.1); }
             30% { transform: scale(1); }
-            45% { transform: scale(1.08); }
+            45% { transform: scale(1.05); }
             60% { transform: scale(1); }
             100% { transform: scale(1); }
         }

@@ -69,7 +69,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 240px;  /* Чуть шире для пропорций */
+            width: 240px;
             height: 140px;
             max-width: 100%;
         }
@@ -86,13 +86,13 @@
             z-index: 2;
         }
 
-        /* Контейнер для волн - квадратный, чтобы круги были идеальными */
+        /* Контейнер для волн - теперь больше, чтобы волны уходили за пределы */
         .wave-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 140px;  /* Равно высоте логотипа для идеального круга */
+            width: 140px;
             height: 140px;
             z-index: 1;
         }
@@ -105,40 +105,36 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.08); /* Очень тонкая, почти невидимая граница */
             background: transparent;
             opacity: 0;
             pointer-events: none;
-            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+            box-shadow: 0 0 20px rgba(255,255,255,0.03); /* Едва заметное свечение */
         }
 
-        /* Класс для запуска анимации волн - последовательно */
+        /* Класс для запуска анимации волн */
         .waves-active .wave-1 {
-            animation: wave-animation 1.5s ease-out forwards;
+            animation: wave-animation 2s ease-out forwards;
         }
 
         .waves-active .wave-2 {
-            animation: wave-animation 1.5s ease-out 0.2s forwards;
+            animation: wave-animation 2s ease-out 0.25s forwards;
         }
 
         .waves-active .wave-3 {
-            animation: wave-animation 1.5s ease-out 0.4s forwards;
+            animation: wave-animation 2s ease-out 0.5s forwards;
         }
 
         @keyframes wave-animation {
             0% {
                 transform: translate(-50%, -50%) scale(1);
-                opacity: 0.5;
-                border-color: rgba(255,255,255,0.3);
-            }
-            50% {
-                border-color: rgba(255,255,255,0.5);
-                opacity: 0.4;
+                opacity: 0.3;
+                border-color: rgba(255,255,255,0.1);
             }
             100% {
-                transform: translate(-50%, -50%) scale(2.5);
+                transform: translate(-50%, -50%) scale(8); /* Уходим далеко за границы экрана */
                 opacity: 0;
-                border-color: rgba(255,255,255,0.1);
+                border-color: rgba(255,255,255,0.02);
             }
         }
 
@@ -159,43 +155,43 @@
         /* Нижняя часть с контентом */
         .content-section {
             flex: 2;
-            padding: 0 16px 24px 16px;  /* Увеличен нижний отступ */
+            padding: 0 16px 24px 16px;
             width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
         }
 
-        /* Контейнер для всех кнопок и статуса - убрана граница */
+        /* Контейнер для всех кнопок и статуса */
         .actions-container {
             background: rgba(255,255,255,0.02);
-            border: none;  /* Убрана граница */
+            border: none;
             border-radius: 28px;
-            padding: 24px 20px;  /* Увеличены отступы */
+            padding: 24px 20px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             width: 100%;
             margin-bottom: 8px;
         }
 
-        /* Статус подписки */
+        /* Статус подписки - жирный */
         .status-text {
             font-size: 16px;
-            font-weight: 400;
-            color: rgba(255,255,255,0.9);
+            font-weight: 600;  /* Сделано жирнее */
+            color: rgba(255,255,255,0.95);
             line-height: 1.5;
             text-align: center;
-            padding: 12px 0 16px 0;  /* Увеличены отступы */
+            padding: 12px 0 16px 0;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;  /* Увеличен отступ */
+            margin-bottom: 20px;
         }
 
-        /* Кнопки - с увеличенными отступами */
+        /* Кнопки */
         .button {
             display: block;
             width: 100%;
             padding: 14px;
-            margin: 10px 0;  /* Увеличены отступы между кнопками */
+            margin: 10px 0;
             border: 1px solid rgba(255,255,255,0.25);
             border-radius: 16px;
             font-size: 15px;
@@ -612,7 +608,7 @@
             setTimeout(() => {
                 logo.classList.remove('logo-pulse');
                 waveContainer.classList.remove('waves-active');
-            }, 1600);
+            }, 2000);
         }
 
         // Запускаем пульсацию логотипа каждые 5 секунд
@@ -858,4 +854,5 @@
     </script>
 </body>
 </html>
+
 

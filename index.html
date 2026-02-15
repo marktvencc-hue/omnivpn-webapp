@@ -86,7 +86,7 @@
             z-index: 2;
         }
 
-        /* Контейнер для волн - постоянная анимация */
+        /* Контейнер для волн */
         .wave-container {
             position: absolute;
             top: 50%;
@@ -105,40 +105,50 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.08);
             background: transparent;
-            box-shadow: 0 0 20px rgba(255,255,255,0.05);
+            box-shadow: 0 0 25px rgba(255,255,255,0.03);
             pointer-events: none;
         }
 
-        /* Постоянные волны с разной задержкой */
+        /* Волны - бесконечные, начинаются за границами логотипа */
         .wave-1 {
-            animation: wave-constant 4s ease-in-out infinite;
+            animation: wave-infinite 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
 
         .wave-2 {
-            animation: wave-constant 4s ease-in-out 1s infinite;
+            animation: wave-infinite 6s cubic-bezier(0.4, 0, 0.2, 1) 2s infinite;
         }
 
         .wave-3 {
-            animation: wave-constant 4s ease-in-out 2s infinite;
+            animation: wave-infinite 6s cubic-bezier(0.4, 0, 0.2, 1) 4s infinite;
         }
 
-        @keyframes wave-constant {
+        @keyframes wave-infinite {
             0% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.3;
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.25;
                 border-color: rgba(255,255,255,0.1);
+            }
+            25% {
+                transform: translate(-50%, -50%) scale(1.8);
+                opacity: 0.2;
+                border-color: rgba(255,255,255,0.15);
             }
             50% {
-                transform: translate(-50%, -50%) scale(1.8);
+                transform: translate(-50%, -50%) scale(2.4);
                 opacity: 0.1;
-                border-color: rgba(255,255,255,0.2);
+                border-color: rgba(255,255,255,0.1);
+            }
+            75% {
+                transform: translate(-50%, -50%) scale(3);
+                opacity: 0.05;
+                border-color: rgba(255,255,255,0.05);
             }
             100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.3;
-                border-color: rgba(255,255,255,0.1);
+                transform: translate(-50%, -50%) scale(3.5);
+                opacity: 0;
+                border-color: rgba(255,255,255,0.02);
             }
         }
 
@@ -352,17 +362,9 @@
             margin-top: 16px;
         }
 
-        /* Блок с ссылкой на подписку */
+        /* Блок с ссылкой на подписку - скрыт */
         .subscription-url-box {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 14px;
-            padding: 14px;
-            word-break: break-all;
-            margin: 16px 0;
-            font-size: 13px;
-            color: rgba(255,255,255,0.9);
-            font-family: monospace;
+            display: none;
         }
 
         /* Подсказка об устройстве */
@@ -373,17 +375,9 @@
             text-align: center;
         }
 
-        /* Статус добавления */
+        /* Статус добавления - скрыт */
         .success-message {
-            color: #ffffff;
-            text-align: center;
-            padding: 10px;
-            font-weight: 500;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
-            margin: 12px 0;
-            font-size: 13px;
+            display: none;
         }
 
         /* Анимации */
@@ -463,7 +457,7 @@
                 <div class="logo-wrapper" id="logoWrapper">
                     <img src="https://raw.githubusercontent.com/marktvencc-hue/omnivpn-webapp/main/photo_5226932146939826416_c.png" alt="OmniVPN" class="logo-image" id="logoImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     
-                    <!-- Контейнер для трёх волн с постоянной анимацией -->
+                    <!-- Контейнер для трёх волн с бесконечной анимацией -->
                     <div class="wave-container">
                         <div class="wave wave-1"></div>
                         <div class="wave wave-2"></div>
@@ -546,9 +540,10 @@
                         <!-- Шаг 2 -->
                         <div id="step2" class="hidden">
                             <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Добавьте подписку</p>
-                            <div id="subscriptionUrlDisplay" class="subscription-url-box">Ссылка загружается...</div>
+                            <!-- Скрытый блок для ссылки, пользователь его не видит -->
+                            <div style="display: none;" id="subscriptionUrlDisplay">Ссылка загружается...</div>
                             <button class="button" onclick="addSubscriptionToHapp()">➕ Добавить подписку</button>
-                            <div id="addStatus" class="success-message"></div>
+                            <div style="display: none;" id="addStatus"></div>
                             <button class="button secondary" onclick="nextStep()">Далее →</button>
                         </div>
                         
@@ -614,6 +609,9 @@
             android_tv: 'https://play.google.com/store/apps/details?id=com.happproxy',
             apple_tv: 'https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274'
         };
+
+        // Схема для открытия ссылок в Happ
+        const HAPP_SCHEME = 'happ://';
 
         // Проверка Telegram WebApp
         if (!window.Telegram || !window.Telegram.WebApp) {
@@ -694,11 +692,6 @@
                 }
                 
                 currentSubscriptionUrl = data.subscription_url || '';
-                
-                const urlDisplay = document.getElementById('subscriptionUrlDisplay');
-                if (urlDisplay) {
-                    urlDisplay.innerText = currentSubscriptionUrl || 'Ссылка не получена';
-                }
             } catch (e) {
                 document.getElementById('statusText').innerText = 'Ошибка загрузки';
             }
@@ -721,7 +714,6 @@
             document.getElementById('step1').classList.add('hidden');
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step3').classList.add('hidden');
-            document.getElementById('addStatus').innerText = '';
             currentStep = 1;
             updateStepIndicators(1);
         }
@@ -810,10 +802,9 @@
 
         async function addSubscriptionToHapp() {
             const addBtn = document.querySelector('#step2 .button');
-            const addStatus = document.getElementById('addStatus');
             
             if (!currentSubscriptionUrl) {
-                addStatus.innerText = '❌ Ссылка не получена';
+                // Без сообщений - просто возвращаемся
                 return;
             }
 
@@ -821,16 +812,26 @@
             addBtn.innerText = '⏳ Добавление...';
             
             try {
-                tg.openLink(currentSubscriptionUrl, { try_instant_view: false });
-                addStatus.innerText = '✅ Подписка добавлена!';
+                // Формируем ссылку для открытия в Happ
+                // Убираем https:// и формируем happ:// ссылку
+                let happUrl = currentSubscriptionUrl;
+                if (happUrl.startsWith('https://')) {
+                    happUrl = HAPP_SCHEME + happUrl.substring(8);
+                } else if (happUrl.startsWith('http://')) {
+                    happUrl = HAPP_SCHEME + happUrl.substring(7);
+                } else {
+                    happUrl = HAPP_SCHEME + happUrl;
+                }
                 
-                setTimeout(() => {
-                    nextStep();
-                }, 1500);
+                tg.openLink(happUrl, { try_instant_view: false });
+                
+                // Убираем задержку и просто переходим к следующему шагу
+                nextStep();
             } catch (e) {
-                addStatus.innerText = '❌ Ошибка: ' + e.message;
+                // В случае ошибки всё равно переходим дальше
                 addBtn.disabled = false;
                 addBtn.innerText = '➕ Добавить подписку';
+                nextStep();
             }
         }
 
@@ -838,7 +839,6 @@
             if (currentStep === 1) {
                 document.getElementById('step1').classList.add('hidden');
                 document.getElementById('step2').classList.remove('hidden');
-                document.getElementById('subscriptionUrlDisplay').innerText = currentSubscriptionUrl || 'Ссылка не получена';
                 currentStep = 2;
                 updateStepIndicators(2);
             } else if (currentStep === 2) {
@@ -862,7 +862,7 @@
             tg.openLink(USER_AGREEMENT_URL);
         }
 
-        // Новая функция для открытия FAQ
+        // Функция для открытия FAQ
         function openFAQ() {
             tg.openLink(FAQ_URL);
         }
@@ -872,3 +872,4 @@
     </script>
 </body>
 </html>
+

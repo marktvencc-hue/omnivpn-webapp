@@ -6,152 +6,514 @@
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+            box-sizing: border-box;
         }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Градиентный фон с эффектом глубины */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Шапка */
         .header {
-            height: 60px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.8);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
             font-weight: 600;
-            border-bottom: 1px solid var(--tg-theme-hint-color, #ccc);
+            font-size: 18px;
+            border: 1px solid rgba(255,255,255,0.2);
         }
+
+        /* Основной контейнер */
         .container {
-            padding: 16px;
+            padding: 24px 20px;
+            flex: 1;
+            position: relative;
+            z-index: 1;
         }
+
+        /* Карточка статуса */
         .status-card {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.2s, border-color 0.2s;
         }
+
+        .status-card:hover {
+            border-color: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .status-label {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .status-value {
+            font-size: 18px;
+            font-weight: 500;
+            color: #ffffff;
+            line-height: 1.5;
+        }
+
+        /* Кнопки */
         .button {
             display: block;
             width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
+            padding: 18px;
+            margin: 12px 0;
             border: none;
-            border-radius: 10px;
+            border-radius: 16px;
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
             text-align: center;
+            transition: all 0.2s;
+            background: #ffffff;
+            color: #000000;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
         }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+
+        .button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
         .button.secondary {
             background: transparent;
-            border: 1px solid var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-color, #2481cc);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #ffffff;
         }
-        .button.success {
-            background: #28a745;
-            color: white;
+
+        .button.secondary:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.5);
         }
-        .hidden {
-            display: none;
+
+        .button:active {
+            transform: scale(0.98);
         }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Заголовки экранов */
+        h3 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        /* Сетка тарифов */
         .tariff-grid {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
+
+        .tariff-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tariff-item:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.2);
+            transform: translateX(4px);
+        }
+
+        .tariff-item.selected {
+            border-color: #ffffff;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .tariff-name {
+            font-size: 18px;
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .tariff-price {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* Информационные строки */
         .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--tg-theme-hint-color, #ddd);
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .link {
-            color: var(--tg-theme-link-color, #2481cc);
-            word-break: break-all;
+
+        .info-row:last-child {
+            border-bottom: none;
         }
-        .back-button {
-            margin-top: 20px;
+
+        .info-label {
+            color: rgba(255,255,255,0.6);
+            font-size: 15px;
         }
-        .success-message {
-            color: #28a745;
-            text-align: center;
-            padding: 10px;
+
+        .info-value {
+            color: #ffffff;
             font-weight: 500;
+        }
+
+        .link {
+            color: #ffffff;
+            word-break: break-all;
+            text-decoration: underline;
+            text-decoration-color: rgba(255,255,255,0.3);
+            text-underline-offset: 4px;
+        }
+
+        .link:hover {
+            text-decoration-color: #ffffff;
+        }
+
+        /* Кнопка назад */
+        .back-button {
+            margin-top: 24px;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Блок с ссылкой на подписку */
+        .subscription-url-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 16px;
+            word-break: break-all;
+            margin: 16px 0;
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            font-family: monospace;
+        }
+
+        /* Подсказка об устройстве */
+        #deviceHint {
+            font-size: 18px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 12px;
+        }
+
+        /* Статус добавления */
+        .success-message {
+            color: #ffffff;
+            text-align: center;
+            padding: 12px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            margin: 12px 0;
+        }
+
+        /* Анимации */
+        .hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Панель отладки */
+        .debug-log {
+            background: #111111;
+            color: #ffffff;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Шаги настройки */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .step.active {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
+
+        .step-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+            max-width: 40px;
         }
     </style>
 </head>
 <body>
-    <div class="header">OmniVPN</div>
-    <div class="container" id="mainScreen">
-        <div class="status-card" id="statusText">Загрузка...</div>
-        <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
-        <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
-        <button class="button" onclick="showProfile()">👤 Профиль</button>
-    </div>
-
-    <div class="container hidden" id="tariffsScreen">
-        <h3>Выберите тариф</h3>
-        <div class="tariff-grid">
-            <button class="button" onclick="buyTariff('1month')">1 месяц — 150 ⭐</button>
-            <button class="button" onclick="buyTariff('3months')">3 месяца — 250 ⭐</button>
-            <button class="button" onclick="buyTariff('6months')">6 месяцев — 350 ⭐</button>
-            <button class="button" onclick="buyTariff('1year')">1 год — 500 ⭐</button>
+    <div class="app">
+        <div class="header">
+            <div class="header-title">OMNIVPN</div>
+            <div class="header-logo">◉</div>
         </div>
-        <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
-    </div>
+        
+        <!-- Панель отладки -->
+        <div id="debugPanel" class="debug-log"></div>
 
-    <div class="container hidden" id="setupScreen">
-        <h3 id="deviceHint">Установка на ...</h3>
-        <p>Настройка VPN в 3 шага</p>
-        <button class="button" onclick="startSetup()">Начать настройку</button>
-        <div id="setupSteps" class="hidden">
-            <p>Шаг 1. Установите приложение Happ</p>
-            <button class="button" id="installButton" onclick="installApp()">Установить</button>
-            <button class="button secondary" onclick="nextStep()">Далее</button>
+        <!-- Главный экран -->
+        <div class="container" id="mainScreen">
+            <div class="status-card">
+                <div class="status-label">Статус подписки</div>
+                <div class="status-value" id="statusText">Загрузка...</div>
+            </div>
             
-            <p class="hidden" id="step2">
-                Шаг 2. Добавьте подписку в приложение Happ<br>
-                <button class="button success" id="addSubscriptionBtn" onclick="addSubscriptionToHapp()">
-                    ➕ Добавить подписку
-                </button>
-                <div id="addStatus" class="success-message"></div>
-                <button class="button secondary" onclick="nextStep()">Далее →</button>
-            </p>
+            <button class="button" onclick="showTariffs()">
+                <span>💰</span> Купить подписку
+            </button>
             
-            <p class="hidden" id="step3">
-                Шаг 3. Готово! Нажмите на круглую кнопку в приложении Happ
-                <button class="button" onclick="finishSetup()">Завершить настройку</button>
-            </p>
+            <button class="button" onclick="showSetup()">
+                <span>🔧</span> Установка и настройка
+            </button>
+            
+            <button class="button" onclick="showProfile()">
+                <span>👤</span> Профиль
+            </button>
         </div>
-        <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+
+        <!-- Экран тарифов -->
+        <div class="container hidden" id="tariffsScreen">
+            <h3>Выберите тариф</h3>
+            <div class="tariff-grid">
+                <div class="tariff-item" onclick="buyTariff('1month')">
+                    <span class="tariff-name">1 месяц</span>
+                    <span class="tariff-price">150 ⭐</span>
+                </div>
+                <div class="tariff-item" onclick="buyTariff('3months')">
+                    <span class="tariff-name">3 месяца</span>
+                    <span class="tariff-price">250 ⭐</span>
+                </div>
+                <div class="tariff-item" onclick="buyTariff('6months')">
+                    <span class="tariff-name">6 месяцев</span>
+                    <span class="tariff-price">350 ⭐</span>
+                </div>
+                <div class="tariff-item" onclick="buyTariff('1year')">
+                    <span class="tariff-name">1 год</span>
+                    <span class="tariff-price">500 ⭐</span>
+                </div>
+            </div>
+            <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+        </div>
+
+        <!-- Экран настройки -->
+        <div class="container hidden" id="setupScreen">
+            <h3 id="deviceHint">Установка на устройство</h3>
+            
+            <div class="step-indicator">
+                <div class="step" id="step1-indicator">1</div>
+                <div class="step-line"></div>
+                <div class="step" id="step2-indicator">2</div>
+                <div class="step-line"></div>
+                <div class="step" id="step3-indicator">3</div>
+            </div>
+            
+            <button class="button" onclick="startSetup()">Начать настройку</button>
+            
+            <div id="setupSteps" class="hidden">
+                <!-- Шаг 1 -->
+                <div id="step1" class="hidden">
+                    <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Установите приложение Happ</p>
+                    <button class="button" onclick="installApp()">Установить</button>
+                    <button class="button secondary" onclick="nextStep()">Далее →</button>
+                </div>
+                
+                <!-- Шаг 2 -->
+                <div id="step2" class="hidden">
+                    <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Добавьте подписку</p>
+                    <div id="subscriptionUrlDisplay" class="subscription-url-box">Ссылка загружается...</div>
+                    <button class="button" onclick="addSubscriptionToHapp()">➕ Добавить подписку</button>
+                    <div id="addStatus" class="success-message"></div>
+                    <button class="button secondary" onclick="nextStep()">Далее →</button>
+                </div>
+                
+                <!-- Шаг 3 -->
+                <div id="step3" class="hidden">
+                    <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Готово! Нажмите на круглую кнопку в приложении Happ</p>
+                    <button class="button" onclick="finishSetup()">Завершить настройку</button>
+                </div>
+            </div>
+            
+            <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+        </div>
+
+        <!-- Экран профиля -->
+        <div class="container hidden" id="profileScreen">
+            <h3>Профиль</h3>
+            
+            <button class="button" onclick="showReferral()">
+                <span>🎁</span> Реферальная программа
+            </button>
+            
+            <button class="button" onclick="openSupport()">
+                <span>🆘</span> Связаться с поддержкой
+            </button>
+            
+            <button class="button" onclick="showTransactions()">
+                <span>📜</span> Мои транзакции
+            </button>
+            
+            <button class="button" onclick="openAgreement()">
+                <span>📄</span> Пользовательское соглашение
+            </button>
+            
+            <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+        </div>
+
+        <!-- Экран реферальной программы -->
+        <div class="container hidden" id="referralScreen">
+            <h3>Реферальная программа</h3>
+            <p style="color: rgba(255,255,255,0.8); margin-bottom: 24px; line-height: 1.6;">
+                За каждого приглашенного друга вы получите 15% бонусных дней от его пополнений.
+            </p>
+            <div id="referralInfo">Загрузка...</div>
+            <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
+        </div>
+
+        <!-- Экран транзакций -->
+        <div class="container hidden" id="transactionsScreen">
+            <h3>История транзакций</h3>
+            <div id="transactionsList">Загрузка...</div>
+            <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
+        </div>
     </div>
 
-    <div class="container hidden" id="profileScreen">
-        <h3>Профиль</h3>
-        <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
-        <button class="button" onclick="openSupport()">🆘 Связаться с поддержкой</button>
-        <button class="button" onclick="showTransactions()">📜 Мои транзакции</button>
-        <button class="button" onclick="openAgreement()">📄 Пользовательское соглашение</button>
-        <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
-    </div>
-
-    <div class="container hidden" id="referralScreen">
-        <h3>Реферальная программа</h3>
-        <p>За каждого приглашенного друга вы получите 15% бонусных дней от его пополнений.</p>
-        <div id="referralInfo">Загрузка...</div>
-        <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
-    </div>
-
-    <div class="container hidden" id="transactionsScreen">
-        <h3>История транзакций</h3>
-        <div id="transactionsList">Загрузка...</div>
-        <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
+        // Инициализация Eruda
+        eruda.init();
+        
         // ---------- НАСТРОЙКИ ----------
         const API_URL = 'https://omnivpn.us.ci';
         const SUPPORT_BOT_USERNAME = 'SupportBot';
@@ -169,31 +531,85 @@
             apple_tv: 'https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274'
         };
 
-        // Проверка наличия Telegram WebApp
+        // Проверка Telegram WebApp
         if (!window.Telegram || !window.Telegram.WebApp) {
-            document.body.innerHTML = '<div style="padding: 20px; text-align: center; color: red;">❌ Ошибка: это приложение должно быть открыто через Telegram. Нажмите кнопку "Открыть приложение" в боте.</div>';
+            document.body.innerHTML = '<div style="padding: 20px; text-align: center; color: white; background: black;">❌ Ошибка: это приложение должно быть открыто через Telegram. Нажмите кнопку "Открыть приложение" в боте.</div>';
             throw new Error('Not in Telegram');
         }
 
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
+        tg.setHeaderColor('#000000');
+        tg.setBackgroundColor('#000000');
 
         let currentStep = 1;
         let currentSubscriptionUrl = '';
 
+        // Функция для отладки
+        function logDebug(message, data) {
+            const debugPanel = document.getElementById('debugPanel');
+            const timestamp = new Date().toLocaleTimeString();
+            const logLine = `[${timestamp}] ${message}: ${JSON.stringify(data, null, 2)}\n`;
+            console.log(logLine);
+            if (debugPanel) {
+                debugPanel.style.display = 'block';
+                debugPanel.innerHTML += logLine;
+                debugPanel.scrollTop = debugPanel.scrollHeight;
+            }
+        }
+
+        // Обновление индикаторов шагов
+        function updateStepIndicators(step) {
+            document.querySelectorAll('.step').forEach((el, index) => {
+                if (index + 1 === step) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+        }
+
         // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
         async function fetchWithAuth(url, options = {}) {
+            logDebug('initData exists', !!tg.initData);
+            logDebug('initData (first 100)', tg.initData?.substring(0, 100) || 'empty');
+            
             options.headers = {
                 ...options.headers,
-                'X-Telegram-Init-Data': tg.initData
+                'X-Telegram-Init-Data': tg.initData || ''
             };
-            const response = await fetch(url, options);
-            if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
-                throw new Error(error.error || `HTTP ${response.status}`);
+            
+            logDebug('Request URL', url);
+            logDebug('Request headers', options.headers);
+            
+            try {
+                const response = await fetch(url, options);
+                logDebug('Response status', response.status);
+                logDebug('Response headers', Object.fromEntries(response.headers));
+                
+                const text = await response.text();
+                logDebug('Response text', text);
+                
+                if (!response.ok) {
+                    let error;
+                    try {
+                        error = JSON.parse(text);
+                    } catch {
+                        error = { error: text };
+                    }
+                    throw new Error(error.error || `HTTP ${response.status}`);
+                }
+                
+                try {
+                    return JSON.parse(text);
+                } catch {
+                    return text;
+                }
+            } catch (e) {
+                logDebug('Fetch error', e.message);
+                throw e;
             }
-            return response.json();
         }
 
         function showScreen(screenId) {
@@ -215,15 +631,22 @@
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
                 const statusEl = document.getElementById('statusText');
+                
                 if (data.subscription_end) {
                     const date = new Date(data.subscription_end);
-                    statusEl.innerText = `Подписка активна до ${date.toLocaleDateString()}`;
+                    statusEl.innerText = `Активна до ${date.toLocaleDateString()}`;
                 } else {
-                    statusEl.innerText = 'Подписка не активирована. Пробный период 3 дня.';
+                    statusEl.innerText = 'Не активирована • 3 дня бесплатно';
                 }
+                
                 currentSubscriptionUrl = data.subscription_url || '';
+                
+                const urlDisplay = document.getElementById('subscriptionUrlDisplay');
+                if (urlDisplay) {
+                    urlDisplay.innerText = currentSubscriptionUrl || 'Ссылка не получена';
+                }
             } catch (e) {
-                document.getElementById('statusText').innerText = 'Ошибка загрузки статуса';
+                document.getElementById('statusText').innerText = 'Ошибка загрузки';
             }
         }
 
@@ -241,8 +664,12 @@
             const platform = tg.platform || 'unknown';
             document.getElementById('deviceHint').innerText = `Установка на ${platform}`;
             document.getElementById('setupSteps').classList.add('hidden');
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
             document.getElementById('addStatus').innerText = '';
             currentStep = 1;
+            updateStepIndicators(1);
         }
 
         function showReferral() {
@@ -277,15 +704,15 @@
         async function loadReferralInfo() {
             try {
                 const data = await fetchWithAuth(API_URL + '/api/referral_info');
-                let html = `<div class="info-row"><span>Приглашено друзей:</span> <strong>${data.count}</strong></div>`;
-                html += `<div class="info-row"><span>Ваша ссылка:</span> <span class="link">${data.link}</span></div>`;
-                html += `<h4>История начислений:</h4>`;
+                let html = `<div class="info-row"><span class="info-label">Приглашено друзей:</span> <span class="info-value">${data.count}</span></div>`;
+                html += `<div class="info-row"><span class="info-label">Ваша ссылка:</span> <span class="link">${data.link}</span></div>`;
+                html += `<h4 style="margin: 24px 0 16px; font-weight: 500;">История начислений</h4>`;
                 if (data.history.length === 0) {
-                    html += '<p>Пока нет начислений</p>';
+                    html += '<p style="color: rgba(255,255,255,0.6);">Пока нет начислений</p>';
                 } else {
                     data.history.forEach(item => {
                         const date = new Date(item.created_at).toLocaleDateString();
-                        html += `<div class="info-row"><span>${date}</span> <strong>+${item.bonus_days} дней</strong></div>`;
+                        html += `<div class="info-row"><span class="info-label">${date}</span> <span class="info-value">+${item.bonus_days} дней</span></div>`;
                     });
                 }
                 document.getElementById('referralInfo').innerHTML = html;
@@ -300,11 +727,11 @@
                 const trans = await fetchWithAuth(API_URL + '/api/transactions');
                 let html = '';
                 if (trans.length === 0) {
-                    html = '<p>Пока нет покупок</p>';
+                    html = '<p style="color: rgba(255,255,255,0.6);">Пока нет покупок</p>';
                 } else {
                     trans.forEach(t => {
                         const date = new Date(t.created_at).toLocaleDateString();
-                        html += `<div class="info-row"><span>${date} (${t.tariff})</span> <strong>${t.amount_stars} ⭐</strong></div>`;
+                        html += `<div class="info-row"><span class="info-label">${date} (${t.tariff})</span> <span class="info-value">${t.amount_stars} ⭐</span></div>`;
                     });
                 }
                 document.getElementById('transactionsList').innerHTML = html;
@@ -316,20 +743,23 @@
         // ---------- НАСТРОЙКА ----------
         function startSetup() {
             document.getElementById('setupSteps').classList.remove('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+            updateStepIndicators(1);
         }
 
         function installApp() {
             const platform = tg.platform;
             let url = APP_LINKS[platform] || APP_LINKS.android;
             tg.openLink(url);
+            nextStep();
         }
 
         async function addSubscriptionToHapp() {
-            const addBtn = document.getElementById('addSubscriptionBtn');
+            const addBtn = document.querySelector('#step2 .button');
             const addStatus = document.getElementById('addStatus');
             
             if (!currentSubscriptionUrl) {
-                addStatus.innerText = '❌ Ссылка на подписку не получена';
+                addStatus.innerText = '❌ Ссылка не получена';
                 return;
             }
 
@@ -337,14 +767,12 @@
             addBtn.innerText = '⏳ Добавление...';
             
             try {
-                // Пробуем открыть ссылку в приложении Happ
                 tg.openLink(currentSubscriptionUrl, { try_instant_view: false });
-                addStatus.innerText = '✅ Подписка добавлена! Перейдите в приложение Happ для активации.';
+                addStatus.innerText = '✅ Подписка добавлена!';
                 
-                // Автоматически переходим к шагу 3 через 2 секунды
                 setTimeout(() => {
                     nextStep();
-                }, 2000);
+                }, 1500);
             } catch (e) {
                 addStatus.innerText = '❌ Ошибка: ' + e.message;
                 addBtn.disabled = false;
@@ -354,11 +782,16 @@
 
         function nextStep() {
             if (currentStep === 1) {
+                document.getElementById('step1').classList.add('hidden');
                 document.getElementById('step2').classList.remove('hidden');
+                document.getElementById('subscriptionUrlDisplay').innerText = currentSubscriptionUrl || 'Ссылка не получена';
                 currentStep = 2;
+                updateStepIndicators(2);
             } else if (currentStep === 2) {
+                document.getElementById('step2').classList.add('hidden');
                 document.getElementById('step3').classList.remove('hidden');
                 currentStep = 3;
+                updateStepIndicators(3);
             }
         }
 

@@ -66,63 +66,71 @@
         }
 
         .logo-image {
-            max-width: 180px;
+            max-width: 220px;
             width: auto;
-            max-height: 120px;
+            max-height: 140px;
             height: auto;
             object-fit: contain;
             filter: brightness(0) invert(1);
+            transform-origin: center;
+        }
+
+        /* Анимация пульсации для логотипа */
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.08); }
+            60% { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
+
+        .logo-pulse {
+            animation: heartbeat 0.8s ease-in-out;
         }
 
         /* Нижняя часть с контентом */
         .content-section {
             flex: 2;
-            padding: 0 20px 16px 20px;
+            padding: 0 16px 16px 16px;
             width: 100%;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
         }
 
-        .content-section::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Карточка статуса */
-        .status-card {
+        /* Контейнер для всех кнопок и статуса */
+        .actions-container {
             background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px;
             padding: 16px;
-            margin-bottom: 12px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            width: 100%;
         }
 
-        .status-label {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .status-value {
+        /* Статус подписки (без заголовка) */
+        .status-text {
             font-size: 16px;
-            font-weight: 500;
-            color: #ffffff;
+            font-weight: 400;
+            color: rgba(255,255,255,0.9);
             line-height: 1.4;
+            text-align: center;
+            padding: 8px 0 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 12px;
         }
 
-        /* Кнопки - прозрачный фон с белой границей */
+        /* Кнопки - более компактные */
         .button {
             display: block;
             width: 100%;
-            padding: 14px;
-            margin: 8px 0;
-            border: 1.5px solid #ffffff;
+            padding: 12px;
+            margin: 6px 0;
+            border: 1px solid rgba(255,255,255,0.3);
             border-radius: 14px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             text-align: center;
@@ -136,26 +144,44 @@
 
         .button:hover {
             background: rgba(255,255,255,0.1);
-            transform: scale(0.98);
         }
 
         .button.secondary {
-            border-color: rgba(255,255,255,0.3);
-            color: rgba(255,255,255,0.8);
+            border-color: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            padding: 10px;
         }
 
-        .button.secondary:hover {
-            border-color: #ffffff;
-            color: #ffffff;
+        /* Спиннер загрузки */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
         }
 
-        .button:active {
-            transform: scale(0.97);
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
         }
 
         /* Заголовки экранов */
         h3 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 500;
             margin-bottom: 16px;
             color: #ffffff;
@@ -166,14 +192,14 @@
         .tariff-grid {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .tariff-item {
             background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 16px;
-            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            padding: 14px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
@@ -187,13 +213,13 @@
         }
 
         .tariff-name {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 500;
             color: #ffffff;
         }
 
         .tariff-price {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #ffffff;
         }
@@ -212,13 +238,13 @@
 
         .info-label {
             color: rgba(255,255,255,0.6);
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .info-value {
             color: #ffffff;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .link {
@@ -227,18 +253,18 @@
             text-decoration: underline;
             text-decoration-color: rgba(255,255,255,0.3);
             text-underline-offset: 4px;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         /* Кнопка назад */
         .back-button {
-            margin-top: 16px;
+            margin-top: 12px;
         }
 
         /* Блок с ссылкой на подписку */
         .subscription-url-box {
             background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 12px;
             padding: 12px;
             word-break: break-all;
@@ -250,22 +276,23 @@
 
         /* Подсказка об устройстве */
         #deviceHint {
-            font-size: 16px;
+            font-size: 15px;
             color: #ffffff;
             margin-bottom: 8px;
+            text-align: center;
         }
 
         /* Статус добавления */
         .success-message {
             color: #ffffff;
             text-align: center;
-            padding: 10px;
+            padding: 8px;
             font-weight: 500;
             background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 10px;
-            margin: 10px 0;
-            font-size: 13px;
+            margin: 8px 0;
+            font-size: 12px;
         }
 
         /* Анимации */
@@ -293,13 +320,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 6px;
+            margin-bottom: 16px;
         }
 
         .step {
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             background: transparent;
             border: 1.5px solid rgba(255,255,255,0.3);
@@ -308,7 +335,7 @@
             justify-content: center;
             font-weight: 500;
             color: rgba(255,255,255,0.6);
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .step.active {
@@ -321,12 +348,12 @@
             flex: 1;
             height: 1px;
             background: rgba(255,255,255,0.2);
-            max-width: 30px;
+            max-width: 25px;
         }
 
         /* Текстовые абзацы */
         p {
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.5;
         }
 
@@ -342,7 +369,7 @@
         <div class="content-wrapper">
             <!-- Верхняя часть с логотипом -->
             <div class="logo-section">
-                <img src="https://i.ibb.co/LhNz4rXy/photo-5226932146939826416-c.jpg" alt="OmniVPN" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <img src="https://i.ibb.co/LhNz4rXy/photo-5226932146939826416-c.jpg" alt="OmniVPN" class="logo-image" id="logoImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                 <div style="display: none; color: white; font-size: 32px; font-weight: 700; letter-spacing: 4px;">◉</div>
             </div>
 
@@ -350,14 +377,18 @@
             <div class="content-section">
                 <!-- Главный экран -->
                 <div id="mainScreen">
-                    <div class="status-card">
-                        <div class="status-label">Статус подписки</div>
-                        <div class="status-value" id="statusText">Загрузка...</div>
+                    <div class="actions-container">
+                        <div id="statusText" class="status-text">
+                            <div class="loading-container">
+                                <span class="loader"></span>
+                                <span>Загрузка...</span>
+                            </div>
+                        </div>
+                        
+                        <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
+                        <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
+                        <button class="button" onclick="showProfile()">👤 Профиль</button>
                     </div>
-                    
-                    <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
-                    <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
-                    <button class="button" onclick="showProfile()">👤 Профиль</button>
                 </div>
 
                 <!-- Экран тарифов -->
@@ -429,18 +460,20 @@
                 <div id="profileScreen" class="hidden">
                     <h3>Профиль</h3>
                     
-                    <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
-                    <button class="button" onclick="openSupport()">🆘 Связаться с поддержкой</button>
-                    <button class="button" onclick="showTransactions()">📜 Мои транзакции</button>
-                    <button class="button" onclick="openAgreement()">📄 Пользовательское соглашение</button>
-                    
-                    <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+                    <div class="actions-container">
+                        <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
+                        <button class="button" onclick="openSupport()">🆘 Связаться с поддержкой</button>
+                        <button class="button" onclick="showTransactions()">📜 Мои транзакции</button>
+                        <button class="button" onclick="openAgreement()">📄 Пользовательское соглашение</button>
+                        
+                        <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+                    </div>
                 </div>
 
                 <!-- Экран реферальной программы -->
                 <div id="referralScreen" class="hidden">
                     <h3>Реферальная программа</h3>
-                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px; line-height: 1.5; font-size: 14px;">
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px; line-height: 1.5; font-size: 13px;">
                         За каждого приглашенного друга вы получите 15% бонусных дней от его пополнений.
                     </p>
                     <div id="referralInfo">Загрузка...</div>
@@ -489,6 +522,21 @@
 
         let currentStep = 1;
         let currentSubscriptionUrl = '';
+
+        // Функция для пульсации логотипа
+        function pulseLogo() {
+            const logo = document.getElementById('logoImage');
+            logo.classList.add('logo-pulse');
+            setTimeout(() => {
+                logo.classList.remove('logo-pulse');
+            }, 800);
+        }
+
+        // Запускаем пульсацию логотипа каждые 30 секунд
+        setInterval(pulseLogo, 30000);
+
+        // Первая пульсация через 5 секунд после загрузки
+        setTimeout(pulseLogo, 5000);
 
         // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
         async function fetchWithAuth(url, options = {}) {
@@ -548,7 +596,7 @@
                 
                 if (data.subscription_end) {
                     const date = new Date(data.subscription_end);
-                    statusEl.innerText = `Активна до ${date.toLocaleDateString()}`;
+                    statusEl.innerText = `Подписка активна до ${date.toLocaleDateString()}`;
                 } else {
                     statusEl.innerText = 'Не активирована • 3 дня бесплатно';
                 }
@@ -622,7 +670,7 @@
                 html += `<div class="info-row"><span class="info-label">Ваша ссылка:</span> <span class="link">${data.link}</span></div>`;
                 html += `<h4 style="margin: 20px 0 12px; font-weight: 500;">История начислений</h4>`;
                 if (data.history.length === 0) {
-                    html += '<p style="color: rgba(255,255,255,0.6); font-size: 14px;">Пока нет начислений</p>';
+                    html += '<p style="color: rgba(255,255,255,0.6); font-size: 13px;">Пока нет начислений</p>';
                 } else {
                     data.history.forEach(item => {
                         const date = new Date(item.created_at).toLocaleDateString();
@@ -641,7 +689,7 @@
                 const trans = await fetchWithAuth(API_URL + '/api/transactions');
                 let html = '';
                 if (trans.length === 0) {
-                    html = '<p style="color: rgba(255,255,255,0.6); font-size: 14px;">Пока нет покупок</p>';
+                    html = '<p style="color: rgba(255,255,255,0.6); font-size: 13px;">Пока нет покупок</p>';
                 } else {
                     trans.forEach(t => {
                         const date = new Date(t.created_at).toLocaleDateString();

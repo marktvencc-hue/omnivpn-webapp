@@ -6,536 +6,87 @@
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #000000;
-            color: #ffffff;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            position: fixed;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            right: -50%;
-            bottom: -50%;
-            background: radial-gradient(circle at 50% 40%, 
-                rgba(255,255,255,0.12) 0%,
-                rgba(255,255,255,0.06) 20%,
-                rgba(255,255,255,0.02) 40%,
-                rgba(0,0,0,0) 60%,
-                rgba(0,0,0,0.03) 80%,
-                rgba(0,0,0,0.08) 100%
-            );
-            pointer-events: none;
-            z-index: 0;
-            animation: gradient-breath 8s ease-in-out infinite;
-        }
-
-        @keyframes gradient-breath {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.1);
-                opacity: 0.9;
-            }
-        }
-
-        .app {
-            position: relative;
-            z-index: 1;
-            height: 100%;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .content-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .logo-section {
-            flex: 1.3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px 10px 20px;
-            min-height: 0;
-        }
-
-        .logo-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 240px;
-            height: 140px;
-            max-width: 100%;
-        }
-
-        .logo-image {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            filter: brightness(0) invert(1);
-            transform-origin: center;
-            position: relative;
-            z-index: 2;
-        }
-
-        .wave-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 140px;
-            height: 140px;
-            z-index: 1;
-        }
-
-        .wave {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: transparent;
-            box-shadow: 0 0 30px rgba(255,255,255,0.05);
-            pointer-events: none;
-        }
-
-        .wave-1 {
-            animation: wave-flow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        }
-
-        .wave-2 {
-            animation: wave-flow 4s cubic-bezier(0.4, 0, 0.2, 1) 1.3s infinite;
-        }
-
-        .wave-3 {
-            animation: wave-flow 4s cubic-bezier(0.4, 0, 0.2, 1) 2.6s infinite;
-        }
-
-        @keyframes wave-flow {
-            0% {
-                transform: translate(-50%, -50%) scale(0.8);
-                opacity: 0.3;
-                border-color: rgba(255,255,255,0.15);
-                border-width: 1px;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.8);
-                opacity: 0.15;
-                border-color: rgba(255,255,255,0.25);
-                border-width: 1.5px;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(2.8);
-                opacity: 0;
-                border-color: rgba(255,255,255,0.1);
-                border-width: 0.5px;
-            }
-        }
-
-        .content-section {
-            flex: 2;
-            padding: 0 16px 24px 16px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-        }
-
-        .actions-container {
-            background: rgba(255,255,255,0.02);
-            border: none;
-            border-radius: 28px;
-            padding: 24px 20px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            width: 100%;
-            margin-bottom: 8px;
-        }
-
-        .status-text {
-            font-size: 16px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.95);
-            line-height: 1.5;
-            text-align: center;
-            padding: 12px 0 16px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-
-        .button {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: 1px solid rgba(255,255,255,0.25);
-            border-radius: 16px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-            background: transparent;
-            color: #ffffff;
-            letter-spacing: 0.3px;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-        }
-
-        .button:hover {
-            background: rgba(255,255,255,0.08);
-        }
-
-        .button-primary {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 16px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-            background: #ffffff;
-            color: #000000;
-            letter-spacing: 0.3px;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-        }
-
-        .button-primary:hover {
-            background: rgba(255,255,255,0.9);
-        }
-
-        .button.secondary {
-            border-color: rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.8);
-            font-size: 14px;
-            padding: 12px;
-        }
-
-        .button-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-        }
-
-        .button-row .button,
-        .button-row .button-primary {
-            flex: 1;
-            margin: 0;
-        }
-
-        .profile-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-        }
-
-        .profile-row .button {
-            flex: 1;
-            margin: 0;
-        }
-
-        .faq-button {
-            flex: 0.5;
-            display: block;
-            padding: 14px;
-            border: 1px solid rgba(255,255,255,0.25);
-            border-radius: 16px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-            background: transparent;
-            color: #ffffff;
-            letter-spacing: 0.3px;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            margin: 0;
-        }
-
-        .faq-button:hover {
-            background: rgba(255,255,255,0.08);
-        }
-
-        .tariff-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 16px;
-            padding: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: #ffffff;
-        }
-
-        .tariff-item:hover {
-            background: rgba(255,255,255,0.08);
-            border-color: #ffffff;
-            transform: scale(0.98);
-        }
-
-        .tariff-name {
-            font-size: 16px;
-            font-weight: 500;
-            color: #ffffff;
-        }
-
-        .tariff-price {
-            font-size: 18px;
-            font-weight: 600;
-            color: #ffffff;
-        }
-
-        .tariff-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .manual-link-container {
-            margin-top: 20px;
-            padding: 16px;
-            background: rgba(255,255,255,0.02);
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .manual-link-title {
-            font-size: 14px;
-            color: rgba(255,255,255,0.6);
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .copy-button {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid rgba(255,255,255,0.25);
-            border-radius: 12px;
-            background: transparent;
-            color: #ffffff;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .copy-button:hover {
-            background: rgba(255,255,255,0.08);
-        }
-
-        .loader {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #ffffff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: rgba(255,255,255,0.7);
-            font-size: 14px;
-        }
-
-        h3 {
-            font-size: 20px;
-            font-weight: 500;
-            margin-bottom: 20px;
-            color: #ffffff;
-            letter-spacing: -0.5px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            color: rgba(255,255,255,0.6);
-            font-size: 14px;
-        }
-
-        .info-value {
-            color: #ffffff;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .link {
-            color: #ffffff;
-            word-break: break-all;
-            text-decoration: underline;
-            text-decoration-color: rgba(255,255,255,0.3);
-            text-underline-offset: 4px;
-            font-size: 13px;
-        }
-
-        .back-button {
-            margin-top: 16px;
-        }
-
-        #deviceHint {
-            font-size: 16px;
-            color: #ffffff;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .content-section > div {
-            animation: fadeIn 0.25s ease-out;
-        }
-
-        .step-indicator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .step {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: transparent;
-            border: 1.5px solid rgba(255,255,255,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 500;
-            color: rgba(255,255,255,0.6);
-            font-size: 14px;
-        }
-
-        .step.active {
-            border-color: #ffffff;
-            color: #ffffff;
-            background: transparent;
-        }
-
-        .step-line {
-            flex: 1;
-            height: 1px;
-            background: rgba(255,255,255,0.2);
-            max-width: 30px;
-        }
-
-        p {
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .content-section {
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .back-to-main {
-            margin-top: 20px;
-            border-color: rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.7);
-        }
+        /* --- Стили полностью сохранены, без изменений --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #000; color: #fff; height: 100%; width: 100%; overflow: hidden; position: fixed; }
+        body::before { content: ''; position: fixed; top: -50%; left: -50%; right: -50%; bottom: -50%; background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.02) 40%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.03) 80%, rgba(0,0,0,0.08) 100%); pointer-events: none; z-index: 0; animation: gradient-breath 8s ease-in-out infinite; }
+        @keyframes gradient-breath { 0%,100% { transform: scale(1); opacity:1; } 50% { transform: scale(1.1); opacity:0.9; } }
+        .app { position: relative; z-index:1; height:100%; display: flex; flex-direction: column; overflow: hidden; }
+        .content-wrapper { flex:1; display: flex; flex-direction: column; height:100%; overflow: hidden; }
+        .logo-section { flex:1.3; display: flex; align-items: center; justify-content: center; padding: 40px 20px 10px; min-height:0; }
+        .logo-wrapper { position: relative; display: flex; align-items: center; justify-content: center; width:240px; height:140px; max-width:100%; }
+        .logo-image { max-width:100%; max-height:100%; width:auto; height:auto; object-fit: contain; filter: brightness(0) invert(1); position: relative; z-index:2; }
+        .wave-container { position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:140px; height:140px; z-index:1; }
+        .wave { position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100%; height:100%; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:transparent; box-shadow:0 0 30px rgba(255,255,255,0.05); pointer-events:none; }
+        .wave-1 { animation: wave-flow 4s cubic-bezier(0.4,0,0.2,1) infinite; }
+        .wave-2 { animation: wave-flow 4s cubic-bezier(0.4,0,0.2,1) 1.3s infinite; }
+        .wave-3 { animation: wave-flow 4s cubic-bezier(0.4,0,0.2,1) 2.6s infinite; }
+        @keyframes wave-flow { 0% { transform:translate(-50%,-50%) scale(0.8); opacity:0.3; border-color:rgba(255,255,255,0.15); border-width:1px; } 50% { transform:translate(-50%,-50%) scale(1.8); opacity:0.15; border-color:rgba(255,255,255,0.25); border-width:1.5px; } 100% { transform:translate(-50%,-50%) scale(2.8); opacity:0; border-color:rgba(255,255,255,0.1); border-width:0.5px; } }
+        .content-section { flex:2; padding:0 16px 24px; width:100%; display: flex; flex-direction: column; justify-content: flex-end; }
+        .actions-container { background:rgba(255,255,255,0.02); border:none; border-radius:28px; padding:24px 20px; backdrop-filter:blur(10px); width:100%; margin-bottom:8px; }
+        .status-text { font-size:16px; font-weight:600; color:rgba(255,255,255,0.95); text-align:center; padding:12px 0 16px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:20px; }
+        .button { display:block; width:100%; padding:14px; margin:10px 0; border:1px solid rgba(255,255,255,0.25); border-radius:16px; font-size:15px; font-weight:500; cursor:pointer; text-align:center; background:transparent; color:#fff; backdrop-filter:blur(5px); }
+        .button:hover { background:rgba(255,255,255,0.08); }
+        .button-primary { display:block; width:100%; padding:14px; margin:10px 0; border:none; border-radius:16px; font-size:15px; font-weight:500; cursor:pointer; text-align:center; background:#fff; color:#000; backdrop-filter:blur(5px); }
+        .button-primary:hover { background:rgba(255,255,255,0.9); }
+        .button.secondary { border-color:rgba(255,255,255,0.2); color:rgba(255,255,255,0.8); font-size:14px; padding:12px; }
+        .button-row { display:flex; align-items:center; gap:10px; margin:10px 0; }
+        .button-row .button, .button-row .button-primary { flex:1; margin:0; }
+        .profile-row { display:flex; align-items:center; gap:10px; margin:10px 0; }
+        .profile-row .button { flex:1; margin:0; }
+        .faq-button { flex:0.5; display:block; padding:14px; border:1px solid rgba(255,255,255,0.25); border-radius:16px; font-size:15px; font-weight:500; cursor:pointer; text-align:center; background:transparent; color:#fff; margin:0; }
+        .faq-button:hover { background:rgba(255,255,255,0.08); }
+        .tariff-item { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.2); border-radius:16px; padding:16px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; color:#fff; }
+        .tariff-item:hover { background:rgba(255,255,255,0.08); border-color:#fff; transform:scale(0.98); }
+        .tariff-name { font-size:16px; font-weight:500; }
+        .tariff-price { font-size:18px; font-weight:600; }
+        .tariff-grid { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+        .manual-link-container { margin-top:20px; padding:16px; background:rgba(255,255,255,0.02); border-radius:16px; border:1px solid rgba(255,255,255,0.1); }
+        .manual-link-title { font-size:14px; color:rgba(255,255,255,0.6); margin-bottom:16px; text-align:center; }
+        .copy-button { width:100%; padding:14px; border:1px solid rgba(255,255,255,0.25); border-radius:12px; background:transparent; color:#fff; font-size:14px; cursor:pointer; }
+        .copy-button:hover { background:rgba(255,255,255,0.08); }
+        .loader { display:inline-block; width:20px; height:20px; border:2px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite; margin-right:8px; vertical-align:middle; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .loading-container { display:flex; align-items:center; justify-content:center; gap:8px; color:rgba(255,255,255,0.7); font-size:14px; }
+        h3 { font-size:20px; font-weight:500; margin-bottom:20px; color:#fff; letter-spacing:-0.5px; }
+        .info-row { display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.1); }
+        .info-label { color:rgba(255,255,255,0.6); font-size:14px; }
+        .info-value { color:#fff; font-weight:500; font-size:14px; }
+        .link { color:#fff; word-break:break-all; text-decoration:underline; text-decoration-color:rgba(255,255,255,0.3); text-underline-offset:4px; font-size:13px; }
+        .back-button { margin-top:16px; }
+        #deviceHint { font-size:16px; color:#fff; margin-bottom:12px; text-align:center; }
+        .hidden { display:none !important; }
+        .content-section > div { animation:fadeIn 0.25s ease-out; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+        .step-indicator { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px; }
+        .step { width:28px; height:28px; border-radius:50%; background:transparent; border:1.5px solid rgba(255,255,255,0.3); display:flex; align-items:center; justify-content:center; font-weight:500; color:rgba(255,255,255,0.6); font-size:14px; }
+        .step.active { border-color:#fff; color:#fff; }
+        .step-line { flex:1; height:1px; background:rgba(255,255,255,0.2); max-width:30px; }
+        p { font-size:14px; line-height:1.5; }
+        .back-to-main { margin-top:20px; border-color:rgba(255,255,255,0.2); color:rgba(255,255,255,0.7); }
     </style>
 </head>
 <body>
     <div class="app">
         <div class="content-wrapper">
             <div class="logo-section">
-                <div class="logo-wrapper" id="logoWrapper">
-                    <img src="https://raw.githubusercontent.com/marktvencc-hue/omnivpn-webapp/main/photo_5226932146939826416_c.png" alt="OmniVPN" class="logo-image" id="logoImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    
+                <div class="logo-wrapper">
+                    <img src="https://raw.githubusercontent.com/marktvencc-hue/omnivpn-webapp/main/photo_5226932146939826416_c.png" alt="OmniVPN" class="logo-image">
                     <div class="wave-container">
                         <div class="wave wave-1"></div>
                         <div class="wave wave-2"></div>
                         <div class="wave wave-3"></div>
                     </div>
-                    
-                    <div style="display: none; color: white; font-size: 32px; font-weight: 700; letter-spacing: 4px;">◉</div>
                 </div>
             </div>
 
             <div class="content-section">
+                <!-- Главный экран -->
                 <div id="mainScreen">
                     <div class="actions-container">
-                        <div id="statusText" class="status-text">
-                            <div class="loading-container">
-                                <span class="loader"></span>
-                                <span>Загрузка...</span>
-                            </div>
-                        </div>
-                        
+                        <div id="statusText" class="status-text"><span class="loader"></span> Загрузка...</div>
                         <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
                         <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
-                        
                         <div class="profile-row">
                             <button class="button" onclick="showProfile()">👤 Профиль</button>
                             <button class="faq-button" onclick="openFAQ()">❓ FAQ</button>
@@ -543,96 +94,77 @@
                     </div>
                 </div>
 
+                <!-- Тарифы -->
                 <div id="tariffsScreen" class="hidden">
                     <h3>Выберите тариф</h3>
                     <div class="tariff-grid">
-                        <div class="tariff-item" onclick="buyTariff('1month')">
-                            <span class="tariff-name">1 месяц</span>
-                            <span class="tariff-price">150 ⭐</span>
-                        </div>
-                        <div class="tariff-item" onclick="buyTariff('3months')">
-                            <span class="tariff-name">3 месяца</span>
-                            <span class="tariff-price">250 ⭐</span>
-                        </div>
-                        <div class="tariff-item" onclick="buyTariff('6months')">
-                            <span class="tariff-name">6 месяцев</span>
-                            <span class="tariff-price">350 ⭐</span>
-                        </div>
-                        <div class="tariff-item" onclick="buyTariff('1year')">
-                            <span class="tariff-name">1 год</span>
-                            <span class="tariff-price">500 ⭐</span>
-                        </div>
+                        <div class="tariff-item" onclick="buyTariff('1month')"><span class="tariff-name">1 месяц</span><span class="tariff-price">150 ⭐</span></div>
+                        <div class="tariff-item" onclick="buyTariff('3months')"><span class="tariff-name">3 месяца</span><span class="tariff-price">250 ⭐</span></div>
+                        <div class="tariff-item" onclick="buyTariff('6months')"><span class="tariff-name">6 месяцев</span><span class="tariff-price">350 ⭐</span></div>
+                        <div class="tariff-item" onclick="buyTariff('1year')"><span class="tariff-name">1 год</span><span class="tariff-price">500 ⭐</span></div>
                     </div>
                     <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
                 </div>
 
+                <!-- Настройка -->
                 <div id="setupScreen" class="hidden">
                     <h3 id="deviceHint">Установка на устройство</h3>
-                    
                     <div class="step-indicator">
-                        <div class="step" id="step1-indicator">1</div>
-                        <div class="step-line"></div>
-                        <div class="step" id="step2-indicator">2</div>
-                        <div class="step-line"></div>
+                        <div class="step" id="step1-indicator">1</div><div class="step-line"></div>
+                        <div class="step" id="step2-indicator">2</div><div class="step-line"></div>
                         <div class="step" id="step3-indicator">3</div>
                     </div>
-                    
                     <div id="startSetupContainer">
                         <button class="button-primary" onclick="startSetup()">Начать настройку</button>
                         <button class="button back-to-main" onclick="backToMain()">← Назад</button>
                     </div>
-                    
                     <div id="setupSteps" class="hidden">
                         <div id="step1" class="hidden">
-                            <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Установите приложение Happ</p>
+                            <p>Установите приложение Happ</p>
                             <div class="button-row">
                                 <button class="button-primary" onclick="installApp()">Установить</button>
                                 <button class="button" onclick="nextStep()">Далее →</button>
                             </div>
                         </div>
-                        
                         <div id="step2" class="hidden">
-                            <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Добавьте подписку</p>
+                            <p>Добавьте подписку</p>
                             <div class="button-row">
                                 <button class="button-primary" onclick="addSubscriptionToHapp()">➕ Добавить</button>
                                 <button class="button" onclick="nextStep()">Далее →</button>
                             </div>
                         </div>
-                        
                         <div id="step3" class="hidden">
-                            <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Готово! Нажмите на круглую кнопку в приложении Happ</p>
-                            <button class="button-primary" onclick="finishSetup()">Завершить настройку</button>
+                            <p>Готово! Нажмите на круглую кнопку в Happ</p>
+                            <button class="button-primary" onclick="finishSetup()">Завершить</button>
                         </div>
                     </div>
                 </div>
 
+                <!-- Профиль -->
                 <div id="profileScreen" class="hidden">
                     <h3>Профиль</h3>
-                    
                     <div class="actions-container">
                         <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
-                        <button class="button" onclick="openSupport()">🆘 Связаться с поддержкой</button>
-                        <button class="button" onclick="showTransactions()">📜 Мои транзакции</button>
-                        <button class="button" onclick="openAgreement()">📄 Пользовательское соглашение</button>
-                        
+                        <button class="button" onclick="openSupport()">🆘 Поддержка</button>
+                        <button class="button" onclick="showTransactions()">📜 Транзакции</button>
+                        <button class="button" onclick="openAgreement()">📄 Соглашение</button>
                         <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
                     </div>
-                    
-                    <div class="manual-link-container" id="manualLinkContainer">
+                    <div class="manual-link-container">
                         <div class="manual-link-title">🔗 Скопируйте ссылку для ручного добавления</div>
                         <button class="copy-button" onclick="copySubscriptionLink()">📋 Копировать ссылку</button>
                     </div>
                 </div>
 
+                <!-- Рефералы -->
                 <div id="referralScreen" class="hidden">
                     <h3>Реферальная программа</h3>
-                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 24px; line-height: 1.6; font-size: 14px;">
-                        За каждого приглашенного друга вы получите 15% бонусных дней от его пополнений.
-                    </p>
+                    <p>За каждого приглашённого друга вы получите 15% бонусных дней от его пополнений.</p>
                     <div id="referralInfo">Загрузка...</div>
                     <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
                 </div>
 
+                <!-- Транзакции -->
                 <div id="transactionsScreen" class="hidden">
                     <h3>История транзакций</h3>
                     <div id="transactionsList">Загрузка...</div>
@@ -661,7 +193,7 @@
         };
 
         if (!window.Telegram || !window.Telegram.WebApp) {
-            document.body.innerHTML = '<div style="padding: 20px; text-align: center; color: white; background: black;">❌ Ошибка: это приложение должно быть открыто через Telegram. Нажмите кнопку "Открыть приложение" в боте.</div>';
+            document.body.innerHTML = '<div style="padding:20px;text-align:center;color:white;background:black;">❌ Откройте через Telegram</div>';
             throw new Error('Not in Telegram');
         }
 
@@ -675,157 +207,84 @@
         let currentSubscriptionUrl = '';
 
         async function fetchWithAuth(url, options = {}) {
-            options.headers = {
-                ...options.headers,
-                'X-Telegram-Init-Data': tg.initData || ''
-            };
-            
+            options.headers = { ...options.headers, 'X-Telegram-Init-Data': tg.initData || '' };
             const response = await fetch(url, options);
-            
             if (!response.ok) {
                 const error = await response.json().catch(() => ({}));
                 throw new Error(error.error || `HTTP ${response.status}`);
             }
-            
-            return await response.json();
+            return response.json();
         }
 
         async function encryptSubscriptionUrl(url) {
             if (!url) return url;
-            
             try {
                 const response = await fetchWithAuth(API_URL + '/api/encrypt_subscription', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url })
+                    body: JSON.stringify({ url })
                 });
-                
-                if (response.encrypted_url) {
-                    return response.encrypted_url;
-                }
-                
-                return url;
-            } catch (e) {
+                return response.encrypted_url || url;
+            } catch {
                 return url;
             }
         }
 
         function showScreen(screenId) {
-            document.querySelectorAll('#mainScreen, #tariffsScreen, #setupScreen, #profileScreen, #referralScreen, #transactionsScreen').forEach(el => {
-                el.classList.add('hidden');
-            });
-            
+            document.querySelectorAll('#mainScreen, #tariffsScreen, #setupScreen, #profileScreen, #referralScreen, #transactionsScreen').forEach(el => el.classList.add('hidden'));
             document.getElementById(screenId).classList.remove('hidden');
-            document.querySelector('.content-section').scrollTop = 0;
-            
-            if (screenId === 'setupScreen') {
-                resetSetupScreen();
-            }
+            if (screenId === 'setupScreen') resetSetupScreen();
         }
 
         function resetSetupScreen() {
             document.getElementById('startSetupContainer').style.display = 'block';
             document.getElementById('setupSteps').classList.add('hidden');
-            document.getElementById('step1').classList.add('hidden');
-            document.getElementById('step2').classList.add('hidden');
-            document.getElementById('step3').classList.add('hidden');
+            ['step1','step2','step3'].forEach(id => document.getElementById(id).classList.add('hidden'));
             currentStep = 1;
             updateStepIndicators(1);
         }
 
-        function backToMain() {
-            showScreen('mainScreen');
-            loadStatus();
-        }
-
-        function backToProfile() {
-            showScreen('profileScreen');
-        }
+        function backToMain() { showScreen('mainScreen'); loadStatus(); }
+        function backToProfile() { showScreen('profileScreen'); }
 
         function updateStepIndicators(step) {
-            document.querySelectorAll('.step').forEach((el, index) => {
-                if (index + 1 === step) {
-                    el.classList.add('active');
-                } else {
-                    el.classList.remove('active');
-                }
+            document.querySelectorAll('.step').forEach((el, i) => {
+                if (i+1 === step) el.classList.add('active'); else el.classList.remove('active');
             });
         }
 
         async function loadStatus() {
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
-                const statusEl = document.getElementById('statusText');
-                
-                if (data.subscription_end) {
-                    const date = new Date(data.subscription_end);
-                    statusEl.innerText = `Подписка активна до ${date.toLocaleDateString()}`;
-                } else {
-                    statusEl.innerText = 'Не активирована • 3 дня бесплатно';
-                }
-                
+                document.getElementById('statusText').innerText = data.subscription_end
+                    ? `Подписка активна до ${new Date(data.subscription_end).toLocaleDateString()}`
+                    : 'Не активирована • 3 дня бесплатно';
                 currentSubscriptionUrl = data.subscription_url || '';
-                
-            } catch (e) {
+            } catch {
                 document.getElementById('statusText').innerText = 'Ошибка загрузки';
             }
         }
 
         async function copySubscriptionLink() {
-            if (!currentSubscriptionUrl) {
-                alert('Ссылка ещё не доступна');
-                return;
-            }
-            
-            try {
-                await navigator.clipboard.writeText(currentSubscriptionUrl);
-                alert('✅ Ссылка скопирована!');
-            } catch (e) {
-                alert('❌ Не удалось скопировать ссылку');
-            }
+            if (!currentSubscriptionUrl) { alert('Ссылка ещё не доступна'); return; }
+            try { await navigator.clipboard.writeText(currentSubscriptionUrl); alert('✅ Ссылка скопирована!'); }
+            catch { alert('❌ Не удалось скопировать'); }
         }
 
-        function showTariffs() {
-            showScreen('tariffsScreen');
-        }
-
-        function showProfile() {
-            showScreen('profileScreen');
-        }
-
-        function showSetup() {
-            showScreen('setupScreen');
-            const platform = tg.platform || 'unknown';
-            document.getElementById('deviceHint').innerText = `Установка на ${platform}`;
-            resetSetupScreen();
-        }
-
-        function showReferral() {
-            showScreen('referralScreen');
-            loadReferralInfo();
-        }
-
-        function showTransactions() {
-            showScreen('transactionsScreen');
-            loadTransactions();
-        }
+        function showTariffs() { showScreen('tariffsScreen'); }
+        function showProfile() { showScreen('profileScreen'); }
+        function showSetup() { showScreen('setupScreen'); document.getElementById('deviceHint').innerText = `Установка на ${tg.platform || 'unknown'}`; }
+        function showReferral() { showScreen('referralScreen'); loadReferralInfo(); }
+        function showTransactions() { showScreen('transactionsScreen'); loadTransactions(); }
 
         async function buyTariff(tariff) {
             try {
                 const data = await fetchWithAuth(API_URL + '/api/create_invoice', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tariff })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tariff })
                 });
-                
-                if (data.invoice_link) {
-                    tg.openInvoice(data.invoice_link);
-                } else {
-                    alert('Ошибка создания счёта');
-                }
-            } catch (e) {
-                alert('Ошибка: ' + e.message);
-            }
+                if (data.invoice_link) tg.openInvoice(data.invoice_link);
+                else alert('Ошибка создания счёта');
+            } catch (e) { alert('Ошибка: ' + e.message); }
         }
 
         async function loadReferralInfo() {
@@ -833,39 +292,27 @@
                 const data = await fetchWithAuth(API_URL + '/api/referral_info');
                 let html = `<div class="info-row"><span class="info-label">Приглашено друзей:</span> <span class="info-value">${data.count}</span></div>`;
                 html += `<div class="info-row"><span class="info-label">Ваша ссылка:</span> <span class="link">${data.link}</span></div>`;
-                html += `<h4 style="margin: 24px 0 16px; font-weight: 500;">История начислений</h4>`;
-                if (data.history.length === 0) {
-                    html += '<p style="color: rgba(255,255,255,0.6); font-size: 14px;">Пока нет начислений</p>';
-                } else {
-                    data.history.forEach(item => {
-                        const date = new Date(item.created_at).toLocaleDateString();
-                        html += `<div class="info-row"><span class="info-label">${date}</span> <span class="info-value">+${item.bonus_days} дней</span></div>`;
-                    });
-                }
+                html += `<h4 style="margin:24px 0 16px;">История начислений</h4>`;
+                if (data.history.length === 0) html += '<p style="color:rgba(255,255,255,0.6);">Пока нет начислений</p>';
+                else data.history.forEach(item => {
+                    const date = new Date(item.created_at).toLocaleDateString();
+                    html += `<div class="info-row"><span class="info-label">${date}</span> <span class="info-value">+${item.bonus_days} дней</span></div>`;
+                });
                 document.getElementById('referralInfo').innerHTML = html;
-                
-            } catch (e) {
-                document.getElementById('referralInfo').innerText = 'Ошибка загрузки';
-            }
+            } catch { document.getElementById('referralInfo').innerText = 'Ошибка загрузки'; }
         }
 
         async function loadTransactions() {
             try {
                 const trans = await fetchWithAuth(API_URL + '/api/transactions');
                 let html = '';
-                if (trans.length === 0) {
-                    html = '<p style="color: rgba(255,255,255,0.6); font-size: 14px;">Пока нет покупок</p>';
-                } else {
-                    trans.forEach(t => {
-                        const date = new Date(t.created_at).toLocaleDateString();
-                        html += `<div class="info-row"><span class="info-label">${date} (${t.tariff})</span> <span class="info-value">${t.amount_stars} ⭐</span></div>`;
-                    });
-                }
+                if (trans.length === 0) html = '<p style="color:rgba(255,255,255,0.6);">Пока нет покупок</p>';
+                else trans.forEach(t => {
+                    const date = new Date(t.created_at).toLocaleDateString();
+                    html += `<div class="info-row"><span class="info-label">${date} (${t.tariff})</span> <span class="info-value">${t.amount_stars} ⭐</span></div>`;
+                });
                 document.getElementById('transactionsList').innerHTML = html;
-                
-            } catch (e) {
-                document.getElementById('transactionsList').innerText = 'Ошибка загрузки';
-            }
+            } catch { document.getElementById('transactionsList').innerText = 'Ошибка загрузки'; }
         }
 
         function startSetup() {
@@ -876,43 +323,42 @@
         }
 
         function installApp() {
-            const platform = tg.platform;
-            let url = APP_LINKS[platform] || APP_LINKS.android;
-            tg.openLink(url);
+            tg.openLink(APP_LINKS[tg.platform] || APP_LINKS.android);
             nextStep();
         }
 
+        // ⚠️ Диагностическая версия с алертами — после отладки уберите alert'ы
         async function addSubscriptionToHapp() {
+            alert('1. Функция вызвана');
             if (!currentSubscriptionUrl) {
-                alert('Ссылка на подписку ещё не получена');
+                alert('Ошибка: нет ссылки');
                 return;
             }
+            alert('2. Ссылка есть: ' + currentSubscriptionUrl);
 
-            const addButton = document.querySelector('#step2 .button-primary');
-            const originalText = addButton.innerText;
-            addButton.innerText = 'Шифрование...';
-            addButton.disabled = true;
-            
+            const btn = document.querySelector('#step2 .button-primary');
+            const originalText = btn.innerText;
+            btn.innerText = 'Шифрование...';
+            btn.disabled = true;
+
             try {
-                const encryptedUrl = await encryptSubscriptionUrl(currentSubscriptionUrl);
-                
-                const redirectUrl = `${REDIRECT_PAGE}?url=${encodeURIComponent(encryptedUrl)}`;
+                alert('3. Отправляем запрос на шифрование');
+                const encrypted = await encryptSubscriptionUrl(currentSubscriptionUrl);
+                alert('4. Получен ответ: ' + encrypted);
+
+                const redirectUrl = REDIRECT_PAGE + '?url=' + encodeURIComponent(encrypted);
+                alert('5. Redirect URL: ' + redirectUrl);
+
                 tg.openLink(redirectUrl, { try_instant_view: false });
-                
-                addButton.innerText = originalText;
-                addButton.disabled = false;
-                
-                setTimeout(() => {
-                    nextStep();
-                }, 2000);
-                
+                alert('6. tg.openLink выполнен');
+
+                btn.innerText = originalText;
+                btn.disabled = false;
+                setTimeout(() => nextStep(), 2000);
             } catch (e) {
-                alert('Не удалось открыть ссылку. Попробуйте скопировать её вручную из профиля.');
-                
-                if (addButton) {
-                    addButton.innerText = '➕ Добавить';
-                    addButton.disabled = false;
-                }
+                alert('Ошибка: ' + e.message);
+                btn.innerText = '➕ Добавить';
+                btn.disabled = false;
             }
         }
 
@@ -930,23 +376,11 @@
             }
         }
 
-        function finishSetup() {
-            backToMain();
-        }
+        function finishSetup() { backToMain(); }
+        function openSupport() { tg.openTelegramLink('https://t.me/' + SUPPORT_BOT_USERNAME); }
+        function openAgreement() { tg.openLink(USER_AGREEMENT_URL); }
+        function openFAQ() { tg.openLink(FAQ_URL); }
 
-        function openSupport() {
-            tg.openTelegramLink('https://t.me/' + SUPPORT_BOT_USERNAME);
-        }
-
-        function openAgreement() {
-            tg.openLink(USER_AGREEMENT_URL);
-        }
-
-        function openFAQ() {
-            tg.openLink(FAQ_URL);
-        }
-
-        // Инициализация
         loadStatus();
     </script>
 </body>

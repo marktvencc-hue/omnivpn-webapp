@@ -304,10 +304,10 @@
             background: rgba(255,255,255,0.08);
         }
 
-        /* Кнопки выбора тарифов с белым фоном */
+        /* Кнопки выбора тарифов - прозрачные как раньше */
         .tariff-item {
-            background: #ffffff;
-            border: none;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 16px;
             padding: 16px;
             cursor: pointer;
@@ -315,24 +315,25 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            color: #000000;
+            color: #ffffff;
         }
 
         .tariff-item:hover {
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.08);
+            border-color: #ffffff;
             transform: scale(0.98);
         }
 
         .tariff-name {
             font-size: 16px;
             font-weight: 500;
-            color: #000000;
+            color: #ffffff;
         }
 
         .tariff-price {
             font-size: 18px;
             font-weight: 600;
-            color: #000000;
+            color: #ffffff;
         }
 
         /* Сетка тарифов */
@@ -341,6 +342,52 @@
             flex-direction: column;
             gap: 10px;
             margin-bottom: 20px;
+        }
+
+        /* Контейнер для ручного ввода ссылки */
+        .manual-link-container {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .manual-link-title {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .manual-link-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 12px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 10px;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .copy-button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 12px;
+            background: transparent;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-button:hover {
+            background: rgba(255,255,255,0.08);
         }
 
         /* Спиннер загрузки */
@@ -415,22 +462,12 @@
             margin-top: 16px;
         }
 
-        /* Блок с ссылкой на подписку - скрыт */
-        .subscription-url-box {
-            display: none;
-        }
-
         /* Подсказка об устройстве */
         #deviceHint {
             font-size: 16px;
             color: #ffffff;
             margin-bottom: 12px;
             text-align: center;
-        }
-
-        /* Статус добавления - скрыт */
-        .success-message {
-            display: none;
         }
 
         /* Анимации */
@@ -608,7 +645,6 @@
                         <!-- Шаг 2 -->
                         <div id="step2" class="hidden">
                             <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Добавьте подписку</p>
-                            <!-- Скрытый блок для ссылки -->
                             <div style="display: none;" id="subscriptionUrlDisplay">Ссылка загружается...</div>
                             <div class="button-row">
                                 <button class="button-primary" onclick="addSubscriptionToHapp()">Добавить</button>
@@ -636,6 +672,13 @@
                         <button class="button" onclick="openAgreement()">📄 Пользовательское соглашение</button>
                         
                         <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
+                    </div>
+                    
+                    <!-- Блок для ручного ввода ссылки на подписку -->
+                    <div class="manual-link-container" id="manualLinkContainer">
+                        <div class="manual-link-title">🔗 Ссылка на подписку для ручного ввода</div>
+                        <div class="manual-link-box" id="subscriptionLinkDisplay">Загрузка...</div>
+                        <button class="copy-button" onclick="copySubscriptionLink()">📋 Копировать ссылку</button>
                     </div>
                 </div>
 
@@ -677,9 +720,6 @@
             android_tv: 'https://play.google.com/store/apps/details?id=com.happproxy',
             apple_tv: 'https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274'
         };
-
-        // Схема для открытия ссылок в Happ
-        const HAPP_SCHEME = 'happ://';
 
         // Проверка Telegram WebApp
         if (!window.Telegram || !window.Telegram.WebApp) {
@@ -729,6 +769,11 @@
             if (screenId === 'setupScreen') {
                 resetSetupScreen();
             }
+            
+            // При показе профиля, обновляем ссылку
+            if (screenId === 'profileScreen') {
+                updateSubscriptionLink();
+            }
         }
 
         function resetSetupScreen() {
@@ -775,8 +820,32 @@
                 }
                 
                 currentSubscriptionUrl = data.subscription_url || '';
+                
+                // Обновляем ссылку в профиле, если он открыт
+                updateSubscriptionLink();
             } catch (e) {
                 document.getElementById('statusText').innerText = 'Ошибка загрузки';
+            }
+        }
+
+        function updateSubscriptionLink() {
+            const linkDisplay = document.getElementById('subscriptionLinkDisplay');
+            if (linkDisplay) {
+                linkDisplay.innerText = currentSubscriptionUrl || 'Ссылка ещё не получена';
+            }
+        }
+
+        async function copySubscriptionLink() {
+            if (!currentSubscriptionUrl) {
+                alert('Ссылка ещё не доступна');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(currentSubscriptionUrl);
+                alert('Ссылка скопирована!');
+            } catch (e) {
+                alert('Не удалось скопировать ссылку');
             }
         }
 
@@ -886,10 +955,18 @@
             }
 
             try {
-                // Используем стандартный URL без схемы, Telegram сам обработает
-                tg.openLink(currentSubscriptionUrl, { try_instant_view: false });
+                // Формируем ссылку с правильной схемой для Happ
+                let happUrl;
+                if (currentSubscriptionUrl.startsWith('https://marzban.')) {
+                    // Если это ссылка на Marzban, используем happ://
+                    happUrl = 'happ://' + currentSubscriptionUrl.replace('https://', '');
+                } else if (currentSubscriptionUrl.startsWith('https://')) {
+                    happUrl = 'happ://' + currentSubscriptionUrl.substring(8);
+                } else {
+                    happUrl = currentSubscriptionUrl;
+                }
                 
-                // Переходим к следующему шагу
+                tg.openLink(happUrl, { try_instant_view: false });
                 nextStep();
             } catch (e) {
                 nextStep();
@@ -933,5 +1010,6 @@
     </script>
 </body>
 </html>
+
 
 

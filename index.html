@@ -6,7 +6,6 @@
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* ... ваш существующий CSS ... */
         * {
             margin: 0;
             padding: 0;
@@ -23,7 +22,6 @@
             position: fixed;
         }
 
-        /* Современный объемный градиент */
         body::before {
             content: '';
             position: fixed;
@@ -65,7 +63,6 @@
             overflow: hidden;
         }
 
-        /* Контейнер для контента */
         .content-wrapper {
             flex: 1;
             display: flex;
@@ -74,7 +71,6 @@
             overflow: hidden;
         }
 
-        /* Верхняя часть с логотипом */
         .logo-section {
             flex: 1.3;
             display: flex;
@@ -106,7 +102,6 @@
             z-index: 2;
         }
 
-        /* Контейнер для волн */
         .wave-container {
             position: absolute;
             top: 50%;
@@ -131,7 +126,6 @@
             pointer-events: none;
         }
 
-        /* Плавные бесконечные волны */
         .wave-1 {
             animation: wave-flow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
@@ -165,7 +159,6 @@
             }
         }
 
-        /* Нижняя часть с контентом */
         .content-section {
             flex: 2;
             padding: 0 16px 24px 16px;
@@ -173,10 +166,8 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            position: relative;
         }
 
-        /* Контейнер для всех кнопок и статуса */
         .actions-container {
             background: rgba(255,255,255,0.02);
             border: none;
@@ -188,7 +179,6 @@
             margin-bottom: 8px;
         }
 
-        /* Статус подписки - жирный */
         .status-text {
             font-size: 16px;
             font-weight: 600;
@@ -200,7 +190,6 @@
             margin-bottom: 20px;
         }
 
-        /* Кнопки */
         .button {
             display: block;
             width: 100%;
@@ -224,7 +213,6 @@
             background: rgba(255,255,255,0.08);
         }
 
-        /* Кнопка с белым фоном (для основных действий) */
         .button-primary {
             display: block;
             width: 100%;
@@ -255,7 +243,6 @@
             padding: 12px;
         }
 
-        /* Контейнер для ряда с кнопками в шагах настройки */
         .button-row {
             display: flex;
             align-items: center;
@@ -269,7 +256,6 @@
             margin: 0;
         }
 
-        /* Контейнер для ряда с профилем и FAQ */
         .profile-row {
             display: flex;
             align-items: center;
@@ -282,7 +268,6 @@
             margin: 0;
         }
 
-        /* Кнопка FAQ - такая же, но уже (flex: 0.5) */
         .faq-button {
             flex: 0.5;
             display: block;
@@ -306,7 +291,6 @@
             background: rgba(255,255,255,0.08);
         }
 
-        /* Кнопки выбора тарифов - прозрачные как раньше */
         .tariff-item {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.2);
@@ -338,7 +322,6 @@
             color: #ffffff;
         }
 
-        /* Сетка тарифов */
         .tariff-grid {
             display: flex;
             flex-direction: column;
@@ -346,7 +329,6 @@
             margin-bottom: 20px;
         }
 
-        /* Контейнер для ручного ввода ссылки */
         .manual-link-container {
             margin-top: 20px;
             padding: 16px;
@@ -358,27 +340,13 @@
         .manual-link-title {
             font-size: 14px;
             color: rgba(255,255,255,0.6);
-            margin-bottom: 10px;
+            margin-bottom: 16px;
             text-align: center;
-        }
-
-        .manual-link-box {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
-            padding: 12px;
-            word-break: break-all;
-            font-family: monospace;
-            font-size: 12px;
-            color: rgba(255,255,255,0.9);
-            margin-bottom: 10px;
-            max-height: 80px;
-            overflow-y: auto;
         }
 
         .copy-button {
             width: 100%;
-            padding: 10px;
+            padding: 14px;
             border: 1px solid rgba(255,255,255,0.25);
             border-radius: 12px;
             background: transparent;
@@ -392,7 +360,6 @@
             background: rgba(255,255,255,0.08);
         }
 
-        /* Спиннер загрузки */
         .loader {
             display: inline-block;
             width: 20px;
@@ -418,7 +385,6 @@
             font-size: 14px;
         }
 
-        /* Заголовки экранов */
         h3 {
             font-size: 20px;
             font-weight: 500;
@@ -427,7 +393,6 @@
             letter-spacing: -0.5px;
         }
 
-        /* Информационные строки */
         .info-row {
             display: flex;
             justify-content: space-between;
@@ -459,12 +424,10 @@
             font-size: 13px;
         }
 
-        /* Кнопка назад */
         .back-button {
             margin-top: 16px;
         }
 
-        /* Подсказка об устройстве */
         #deviceHint {
             font-size: 16px;
             color: #ffffff;
@@ -472,7 +435,6 @@
             text-align: center;
         }
 
-        /* Анимации */
         .hidden {
             display: none !important;
         }
@@ -492,7 +454,6 @@
             animation: fadeIn 0.25s ease-out;
         }
 
-        /* Шаги настройки */
         .step-indicator {
             display: flex;
             align-items: center;
@@ -528,92 +489,30 @@
             max-width: 30px;
         }
 
-        /* Текстовые абзацы */
         p {
             font-size: 14px;
             line-height: 1.5;
         }
 
-        /* Убираем скролл полностью */
         .content-section {
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
 
-        /* Кнопка "Назад" под "Начать настройку" */
         .back-to-main {
             margin-top: 20px;
             border-color: rgba(255,255,255,0.2);
             color: rgba(255,255,255,0.7);
-        }
-
-        /* НОВЫЕ СТИЛИ ДЛЯ ЛОГГЕРА */
-        .debug-panel {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            padding: 12px;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 11px;
-            color: #00ff00;
-            display: none;
-        }
-        
-        .debug-panel.visible {
-            display: block;
-        }
-        
-        .debug-toggle {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 20px;
-            padding: 8px 16px;
-            color: white;
-            font-size: 12px;
-            z-index: 1001;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-        
-        .debug-log-entry {
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 4px 0;
-            word-break: break-all;
-        }
-        
-        .debug-log-error {
-            color: #ff5555;
-        }
-        
-        .debug-log-success {
-            color: #55ff55;
-        }
-        
-        .debug-log-warning {
-            color: #ffff55;
         }
     </style>
 </head>
 <body>
     <div class="app">
         <div class="content-wrapper">
-            <!-- Верхняя часть с логотипом -->
             <div class="logo-section">
                 <div class="logo-wrapper" id="logoWrapper">
                     <img src="https://raw.githubusercontent.com/marktvencc-hue/omnivpn-webapp/main/photo_5226932146939826416_c.png" alt="OmniVPN" class="logo-image" id="logoImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     
-                    <!-- Контейнер для трёх волн с бесконечной анимацией -->
                     <div class="wave-container">
                         <div class="wave wave-1"></div>
                         <div class="wave wave-2"></div>
@@ -624,9 +523,7 @@
                 </div>
             </div>
 
-            <!-- Нижняя часть с контентом -->
             <div class="content-section">
-                <!-- Главный экран -->
                 <div id="mainScreen">
                     <div class="actions-container">
                         <div id="statusText" class="status-text">
@@ -639,7 +536,6 @@
                         <button class="button" onclick="showTariffs()">💰 Купить подписку</button>
                         <button class="button" onclick="showSetup()">🔧 Установка и настройка</button>
                         
-                        <!-- Ряд с профилем и FAQ -->
                         <div class="profile-row">
                             <button class="button" onclick="showProfile()">👤 Профиль</button>
                             <button class="faq-button" onclick="openFAQ()">❓ FAQ</button>
@@ -647,7 +543,6 @@
                     </div>
                 </div>
 
-                <!-- Экран тарифов -->
                 <div id="tariffsScreen" class="hidden">
                     <h3>Выберите тариф</h3>
                     <div class="tariff-grid">
@@ -671,7 +566,6 @@
                     <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
                 </div>
 
-                <!-- Экран настройки -->
                 <div id="setupScreen" class="hidden">
                     <h3 id="deviceHint">Установка на устройство</h3>
                     
@@ -683,16 +577,12 @@
                         <div class="step" id="step3-indicator">3</div>
                     </div>
                     
-                    <!-- Кнопка "Начать настройку" -->
                     <div id="startSetupContainer">
                         <button class="button-primary" onclick="startSetup()">Начать настройку</button>
-                        <!-- Кнопка "Назад" под "Начать настройку" -->
                         <button class="button back-to-main" onclick="backToMain()">← Назад</button>
                     </div>
                     
-                    <!-- Шаги настройки (изначально скрыты) -->
                     <div id="setupSteps" class="hidden">
-                        <!-- Шаг 1 -->
                         <div id="step1" class="hidden">
                             <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Установите приложение Happ</p>
                             <div class="button-row">
@@ -701,26 +591,14 @@
                             </div>
                         </div>
                         
-                        <!-- Шаг 2 -->
                         <div id="step2" class="hidden">
                             <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Добавьте подписку</p>
                             <div class="button-row">
                                 <button class="button-primary" onclick="addSubscriptionToHapp()">➕ Добавить</button>
                                 <button class="button" onclick="nextStep()">Далее →</button>
                             </div>
-                            <!-- ТЕСТОВЫЕ КНОПКИ -->
-                            <div class="button-row" style="margin-top: 10px;">
-                                <button class="button" onclick="testSubscriptionLink()">🔍 Тест ссылки</button>
-                                <button class="button" onclick="copyCurrentSubscriptionUrl()">📋 Копировать</button>
-                            </div>
-                            <!-- НОВАЯ КНОПКА ТЕСТА ШИФРОВАНИЯ -->
-                            <div class="button-row" style="margin-top: 10px;">
-                                <button class="button" onclick="testEncryption()">🔐 Тест шифрования</button>
-                            </div>
-                            <div style="display: none;" id="addStatus"></div>
                         </div>
                         
-                        <!-- Шаг 3 -->
                         <div id="step3" class="hidden">
                             <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Готово! Нажмите на круглую кнопку в приложении Happ</p>
                             <button class="button-primary" onclick="finishSetup()">Завершить настройку</button>
@@ -728,7 +606,6 @@
                     </div>
                 </div>
 
-                <!-- Экран профиля -->
                 <div id="profileScreen" class="hidden">
                     <h3>Профиль</h3>
                     
@@ -741,15 +618,12 @@
                         <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
                     </div>
                     
-                    <!-- Блок для ручного ввода ссылки на подписку -->
                     <div class="manual-link-container" id="manualLinkContainer">
-                        <div class="manual-link-title">🔗 Ссылка на подписку для ручного ввода</div>
-                        <div class="manual-link-box" id="subscriptionLinkDisplay">Загрузка...</div>
+                        <div class="manual-link-title">🔗 Скопируйте ссылку для ручного добавления</div>
                         <button class="copy-button" onclick="copySubscriptionLink()">📋 Копировать ссылку</button>
                     </div>
                 </div>
 
-                <!-- Экран реферальной программы -->
                 <div id="referralScreen" class="hidden">
                     <h3>Реферальная программа</h3>
                     <p style="color: rgba(255,255,255,0.8); margin-bottom: 24px; line-height: 1.6; font-size: 14px;">
@@ -759,7 +633,6 @@
                     <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
                 </div>
 
-                <!-- Экран транзакций -->
                 <div id="transactionsScreen" class="hidden">
                     <h3>История транзакций</h3>
                     <div id="transactionsList">Загрузка...</div>
@@ -769,21 +642,13 @@
         </div>
     </div>
 
-    <!-- НОВАЯ ПАНЕЛЬ ОТЛАДКИ -->
-    <div class="debug-toggle" onclick="toggleDebugPanel()">🐛 Отладка</div>
-    <div class="debug-panel" id="debugPanel">
-        <div style="font-weight: bold; margin-bottom: 8px;">📋 Лог операций:</div>
-        <div id="debugLogs"></div>
-    </div>
-
     <script>
-        // ---------- НАСТРОЙКИ ----------
         const API_URL = 'https://omnivpn.us.ci';
         const SUPPORT_BOT_USERNAME = 'SupportBot';
         const USER_AGREEMENT_URL = 'https://telegra.ph/User-Agreement';
         const FAQ_URL = 'https://telegra.ph/FAQ-OmniVPN-01';
+        const REDIRECT_PAGE = 'https://omnivpn.us.ci/redirect.html'; // ЗАМЕНИТЕ НА ВАШ URL
 
-        // Ссылки на приложение по платформам
         const APP_LINKS = {
             android: 'https://play.google.com/store/apps/details?id=com.happproxy',
             ios: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973',
@@ -795,7 +660,6 @@
             apple_tv: 'https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274'
         };
 
-        // Проверка Telegram WebApp
         if (!window.Telegram || !window.Telegram.WebApp) {
             document.body.innerHTML = '<div style="padding: 20px; text-align: center; color: white; background: black;">❌ Ошибка: это приложение должно быть открыто через Telegram. Нажмите кнопку "Открыть приложение" в боте.</div>';
             throw new Error('Not in Telegram');
@@ -810,66 +674,26 @@
         let currentStep = 1;
         let currentSubscriptionUrl = '';
 
-        // НОВАЯ ФУНКЦИЯ ДЛЯ ЛОГГИРОВАНИЯ
-        function addLog(message, type = 'info') {
-            const logDiv = document.getElementById('debugLogs');
-            const entry = document.createElement('div');
-            entry.className = 'debug-log-entry';
-            
-            const time = new Date().toLocaleTimeString();
-            let colorClass = '';
-            
-            if (type === 'error') colorClass = 'debug-log-error';
-            else if (type === 'success') colorClass = 'debug-log-success';
-            else if (type === 'warning') colorClass = 'debug-log-warning';
-            
-            entry.innerHTML = `<span style="color: #888;">[${time}]</span> <span class="${colorClass}">${message}</span>`;
-            logDiv.appendChild(entry);
-            logDiv.scrollTop = logDiv.scrollHeight;
-            
-            // Также выводим в консоль
-            console.log(`[${time}] ${message}`);
-        }
-
-        function toggleDebugPanel() {
-            const panel = document.getElementById('debugPanel');
-            panel.classList.toggle('visible');
-        }
-
-        // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
         async function fetchWithAuth(url, options = {}) {
-            addLog(`🌐 Запрос к ${url}`, 'info');
-            
             options.headers = {
                 ...options.headers,
                 'X-Telegram-Init-Data': tg.initData || ''
             };
             
-            try {
-                const response = await fetch(url, options);
-                addLog(`📥 Статус ответа: ${response.status}`, response.ok ? 'success' : 'warning');
-                
-                if (!response.ok) {
-                    const error = await response.json().catch(() => ({}));
-                    addLog(`❌ Ошибка: ${error.error || response.status}`, 'error');
-                    throw new Error(error.error || `HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                addLog(`✅ Успешный ответ от ${url}`, 'success');
-                return data;
-            } catch (e) {
-                addLog(`❌ Исключение при запросе: ${e.message}`, 'error');
-                throw e;
+            const response = await fetch(url, options);
+            
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.error || `HTTP ${response.status}`);
             }
+            
+            return response.json();
         }
 
-        // Функция для шифрования ссылки через API (используется только при добавлении)
         async function encryptSubscriptionUrl(url) {
             if (!url) return url;
             
-            addLog(`🔐 Начинаем шифрование URL: ${url}`, 'info');
-            
+            console.log('🔐 Encrypting URL:', url);
             try {
                 const response = await fetchWithAuth(API_URL + '/api/encrypt_subscription', {
                     method: 'POST',
@@ -877,55 +701,27 @@
                     body: JSON.stringify({ url: url })
                 });
                 
-                addLog(`📡 Ответ от API шифрования: ${JSON.stringify(response)}`, 'info');
+                console.log('📡 Encryption response:', response);
                 
                 if (response.encrypted_url) {
-                    addLog(`✅ URL зашифрован (тип: ${response.encryption_type || 'unknown'})`, 'success');
-                    addLog(`🔗 Зашифрованная ссылка: ${response.encrypted_url}`, 'success');
+                    console.log('✅ URL encrypted successfully:', response.encryption_type || 'crypt4');
                     return response.encrypted_url;
                 }
-                
-                addLog(`⚠️ API не вернул encrypted_url, использую оригинал`, 'warning');
                 return url;
             } catch (e) {
-                addLog(`❌ Ошибка шифрования: ${e.message}`, 'error');
+                console.error('❌ Encryption error:', e);
                 return url;
             }
-        }
-
-        // НОВАЯ ФУНКЦИЯ ДЛЯ ТЕСТА ШИФРОВАНИЯ
-        async function testEncryption() {
-            if (!currentSubscriptionUrl) {
-                addLog('❌ Нет ссылки для теста', 'error');
-                alert('Нет ссылки для теста');
-                return;
-            }
-            
-            addLog('🧪 Запуск теста шифрования...', 'info');
-            addLog(`📎 Оригинальная ссылка: ${currentSubscriptionUrl}`, 'info');
-            
-            const encrypted = await encryptSubscriptionUrl(currentSubscriptionUrl);
-            
-            addLog(`📎 Зашифрованная ссылка: ${encrypted}`, encrypted.startsWith('happ://') ? 'success' : 'warning');
-            
-            alert(`Оригинальная: ${currentSubscriptionUrl}\n\nЗашифрованная: ${encrypted}`);
         }
 
         function showScreen(screenId) {
-            addLog(`📺 Переключение на экран: ${screenId}`, 'info');
-            
-            // Скрываем все экраны
             document.querySelectorAll('#mainScreen, #tariffsScreen, #setupScreen, #profileScreen, #referralScreen, #transactionsScreen').forEach(el => {
                 el.classList.add('hidden');
             });
             
-            // Показываем нужный экран
             document.getElementById(screenId).classList.remove('hidden');
-            
-            // Сбрасываем прокрутку
             document.querySelector('.content-section').scrollTop = 0;
             
-            // При показе экрана настройки, сбрасываем состояние шагов
             if (screenId === 'setupScreen') {
                 resetSetupScreen();
             }
@@ -950,7 +746,6 @@
             showScreen('profileScreen');
         }
 
-        // Обновление индикаторов шагов
         function updateStepIndicators(step) {
             document.querySelectorAll('.step').forEach((el, index) => {
                 if (index + 1 === step) {
@@ -961,62 +756,42 @@
             });
         }
 
-        // ---------- ЗАГРУЗКА СТАТУСА ----------
         async function loadStatus() {
-            addLog('📊 Загрузка статуса пользователя...', 'info');
-            
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
-                addLog(`📡 Данные статуса: ${JSON.stringify(data)}`, 'info');
-                
+                console.log('📡 User status response:', data);
                 const statusEl = document.getElementById('statusText');
                 
                 if (data.subscription_end) {
                     const date = new Date(data.subscription_end);
                     statusEl.innerText = `Подписка активна до ${date.toLocaleDateString()}`;
-                    addLog(`✅ Подписка активна до ${date.toLocaleDateString()}`, 'success');
                 } else {
                     statusEl.innerText = 'Не активирована • 3 дня бесплатно';
-                    addLog(`ℹ️ Подписка не активирована, доступен пробный период`, 'info');
                 }
                 
                 currentSubscriptionUrl = data.subscription_url || '';
-                addLog(`🔗 Получена ссылка на подписку: ${currentSubscriptionUrl || 'отсутствует'}`, 'info');
-                
-                // Обновляем ссылку в профиле
-                updateSubscriptionLink();
+                console.log('🔗 Original subscription URL:', currentSubscriptionUrl);
                 
             } catch (e) {
-                addLog(`❌ Ошибка загрузки статуса: ${e.message}`, 'error');
+                console.error('❌ Error loading status:', e);
                 document.getElementById('statusText').innerText = 'Ошибка загрузки';
-            }
-        }
-
-        function updateSubscriptionLink() {
-            const linkDisplay = document.getElementById('subscriptionLinkDisplay');
-            if (linkDisplay) {
-                linkDisplay.innerText = currentSubscriptionUrl || 'Ссылка ещё не получена';
             }
         }
 
         async function copySubscriptionLink() {
             if (!currentSubscriptionUrl) {
-                addLog('❌ Попытка копирования без ссылки', 'warning');
                 alert('Ссылка ещё не доступна');
                 return;
             }
             
             try {
                 await navigator.clipboard.writeText(currentSubscriptionUrl);
-                addLog('📋 Ссылка скопирована в буфер обмена', 'success');
-                alert('Ссылка скопирована!');
+                alert('✅ Ссылка скопирована!');
             } catch (e) {
-                addLog(`❌ Ошибка копирования: ${e.message}`, 'error');
-                alert('Не удалось скопировать ссылку');
+                alert('❌ Не удалось скопировать ссылку');
             }
         }
 
-        // ---------- ПОКАЗ ЭКРАНОВ ----------
         function showTariffs() {
             showScreen('tariffsScreen');
         }
@@ -1029,7 +804,6 @@
             showScreen('setupScreen');
             const platform = tg.platform || 'unknown';
             document.getElementById('deviceHint').innerText = `Установка на ${platform}`;
-            addLog(`📱 Платформа пользователя: ${platform}`, 'info');
             resetSetupScreen();
         }
 
@@ -1043,40 +817,29 @@
             loadTransactions();
         }
 
-        // ---------- ПОКУПКА ТАРИФА ----------
         async function buyTariff(tariff) {
-            addLog(`💰 Покупка тарифа: ${tariff}`, 'info');
-            
             try {
                 const data = await fetchWithAuth(API_URL + '/api/create_invoice', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ tariff })
                 });
-                
                 if (data.invoice_link) {
-                    addLog(`🧾 Получен инвойс: ${data.invoice_link}`, 'success');
                     tg.openInvoice(data.invoice_link);
                 } else {
-                    addLog(`❌ Ошибка создания счёта: нет invoice_link`, 'error');
                     alert('Ошибка создания счёта');
                 }
             } catch (e) {
-                addLog(`❌ Ошибка покупки: ${e.message}`, 'error');
                 alert('Ошибка: ' + e.message);
             }
         }
 
-        // ---------- РЕФЕРАЛЬНАЯ ИНФОРМАЦИЯ ----------
         async function loadReferralInfo() {
-            addLog('👥 Загрузка реферальной информации...', 'info');
-            
             try {
                 const data = await fetchWithAuth(API_URL + '/api/referral_info');
                 let html = `<div class="info-row"><span class="info-label">Приглашено друзей:</span> <span class="info-value">${data.count}</span></div>`;
                 html += `<div class="info-row"><span class="info-label">Ваша ссылка:</span> <span class="link">${data.link}</span></div>`;
                 html += `<h4 style="margin: 24px 0 16px; font-weight: 500;">История начислений</h4>`;
-                
                 if (data.history.length === 0) {
                     html += '<p style="color: rgba(255,255,255,0.6); font-size: 14px;">Пока нет начислений</p>';
                 } else {
@@ -1085,46 +848,31 @@
                         html += `<div class="info-row"><span class="info-label">${date}</span> <span class="info-value">+${item.bonus_days} дней</span></div>`;
                     });
                 }
-                
                 document.getElementById('referralInfo').innerHTML = html;
-                addLog(`✅ Загружена реферальная информация: ${data.count} друзей`, 'success');
-                
             } catch (e) {
-                addLog(`❌ Ошибка загрузки реферальной информации: ${e.message}`, 'error');
                 document.getElementById('referralInfo').innerText = 'Ошибка загрузки';
             }
         }
 
-        // ---------- ИСТОРИЯ ТРАНЗАКЦИЙ ----------
         async function loadTransactions() {
-            addLog('📜 Загрузка истории транзакций...', 'info');
-            
             try {
                 const trans = await fetchWithAuth(API_URL + '/api/transactions');
                 let html = '';
-                
                 if (trans.length === 0) {
                     html = '<p style="color: rgba(255,255,255,0.6); font-size: 14px;">Пока нет покупок</p>';
-                    addLog('ℹ️ История транзакций пуста', 'info');
                 } else {
                     trans.forEach(t => {
                         const date = new Date(t.created_at).toLocaleDateString();
                         html += `<div class="info-row"><span class="info-label">${date} (${t.tariff})</span> <span class="info-value">${t.amount_stars} ⭐</span></div>`;
                     });
-                    addLog(`✅ Загружено ${trans.length} транзакций`, 'success');
                 }
-                
                 document.getElementById('transactionsList').innerHTML = html;
-                
             } catch (e) {
-                addLog(`❌ Ошибка загрузки транзакций: ${e.message}`, 'error');
                 document.getElementById('transactionsList').innerText = 'Ошибка загрузки';
             }
         }
 
-        // ---------- НАСТРОЙКА ----------
         function startSetup() {
-            addLog('▶️ Начало настройки', 'info');
             document.getElementById('startSetupContainer').style.display = 'none';
             document.getElementById('setupSteps').classList.remove('hidden');
             document.getElementById('step1').classList.remove('hidden');
@@ -1134,71 +882,40 @@
         function installApp() {
             const platform = tg.platform;
             let url = APP_LINKS[platform] || APP_LINKS.android;
-            addLog(`📲 Установка приложения для платформы ${platform}: ${url}`, 'info');
             tg.openLink(url);
             nextStep();
         }
 
-        // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ С ЛОГАМИ ==========
         async function addSubscriptionToHapp() {
-            addLog('➕ Нажата кнопка "Добавить подписку"', 'info');
-            
             if (!currentSubscriptionUrl) {
-                addLog('❌ Ошибка: ссылка на подписку не получена', 'error');
                 alert('Ссылка на подписку ещё не получена');
                 return;
             }
 
-            addLog(`📎 Текущая ссылка для добавления: ${currentSubscriptionUrl}`, 'info');
-
             try {
-                // Показываем индикатор загрузки
                 const addButton = document.querySelector('#step2 .button-primary');
                 const originalText = addButton.innerText;
                 addButton.innerText = '⏳ Шифрование...';
                 addButton.disabled = true;
                 
-                addLog('🔐 Начинаем процесс шифрования...', 'info');
-                
-                // Шифруем ссылку
                 const encryptedUrl = await encryptSubscriptionUrl(currentSubscriptionUrl);
+                console.log('🔗 Encrypted URL:', encryptedUrl);
                 
-                addLog(`🔗 Зашифрованная ссылка получена: ${encryptedUrl}`, 'success');
+                // Открываем через страницу-редиректор
+                const redirectUrl = `${REDIRECT_PAGE}?url=${encodeURIComponent(encryptedUrl)}`;
+                tg.openLink(redirectUrl, { try_instant_view: false });
                 
-                // Определяем платформу
-                const platform = tg.platform;
-                addLog(`📱 Платформа пользователя: ${platform}`, 'info');
-                
-                // Пробуем открыть ссылку
-                addLog(`🚀 Попытка открыть ссылку: ${encryptedUrl}`, 'info');
-                
-                try {
-                    if (platform === 'android' || platform === 'ios' || platform === 'ipados') {
-                        tg.openLink(encryptedUrl, { try_instant_view: false });
-                        addLog('✅ Ссылка открыта через tg.openLink()', 'success');
-                    } else {
-                        window.open(encryptedUrl, '_blank');
-                        addLog('✅ Ссылка открыта через window.open()', 'success');
-                    }
-                } catch (openError) {
-                    addLog(`❌ Ошибка при открытии ссылки: ${openError.message}`, 'error');
-                    throw openError;
-                }
-                
-                // Восстанавливаем кнопку
                 addButton.innerText = originalText;
                 addButton.disabled = false;
                 
-                addLog('➡️ Переход к следующему шагу', 'info');
-                nextStep();
+                setTimeout(() => {
+                    nextStep();
+                }, 2000);
                 
             } catch (e) {
-                addLog(`❌ Критическая ошибка в addSubscriptionToHapp: ${e.message}`, 'error');
-                console.error('Full error:', e);
-                
+                console.error('❌ Failed to open URL:', e);
                 alert('Не удалось открыть ссылку. Попробуйте скопировать её вручную из профиля.');
                 
-                // Восстанавливаем кнопку
                 const addButton = document.querySelector('#step2 .button-primary');
                 if (addButton) {
                     addButton.innerText = '➕ Добавить';
@@ -1207,39 +924,13 @@
             }
         }
 
-        // ========== ТЕСТОВЫЕ ФУНКЦИИ ==========
-        function testSubscriptionLink() {
-            addLog(`🔍 Тест ссылки: ${currentSubscriptionUrl || 'не получена'}`, 'info');
-            console.log('Current subscription URL:', currentSubscriptionUrl);
-            alert('Ссылка: ' + (currentSubscriptionUrl || 'не получена'));
-        }
-
-        async function copyCurrentSubscriptionUrl() {
-            if (!currentSubscriptionUrl) {
-                addLog('❌ Попытка копирования без ссылки', 'warning');
-                alert('Ссылка ещё не получена');
-                return;
-            }
-            
-            try {
-                await navigator.clipboard.writeText(currentSubscriptionUrl);
-                addLog('✅ Оригинальная ссылка скопирована в буфер', 'success');
-                alert('✅ Оригинальная ссылка скопирована!\n\nЕсли не работает через кнопку, вставьте её вручную в приложении Happ');
-            } catch (e) {
-                addLog(`❌ Ошибка копирования: ${e.message}`, 'error');
-                alert('❌ Ошибка копирования');
-            }
-        }
-
         function nextStep() {
             if (currentStep === 1) {
-                addLog('➡️ Переход к шагу 2', 'info');
                 document.getElementById('step1').classList.add('hidden');
                 document.getElementById('step2').classList.remove('hidden');
                 currentStep = 2;
                 updateStepIndicators(2);
             } else if (currentStep === 2) {
-                addLog('➡️ Переход к шагу 3', 'info');
                 document.getElementById('step2').classList.add('hidden');
                 document.getElementById('step3').classList.remove('hidden');
                 currentStep = 3;
@@ -1248,33 +939,26 @@
         }
 
         function finishSetup() {
-            addLog('✅ Настройка завершена', 'success');
             backToMain();
         }
 
-        // ---------- ПРОФИЛЬ ----------
         function openSupport() {
-            addLog('🆘 Открытие поддержки', 'info');
             tg.openTelegramLink('https://t.me/' + SUPPORT_BOT_USERNAME);
         }
 
         function openAgreement() {
-            addLog('📄 Открытие пользовательского соглашения', 'info');
             tg.openLink(USER_AGREEMENT_URL);
         }
 
         function openFAQ() {
-            addLog('❓ Открытие FAQ', 'info');
             tg.openLink(FAQ_URL);
         }
 
-        // ---------- ИНИЦИАЛИЗАЦИЯ ----------
-        addLog('🚀 Инициализация приложения...', 'info');
-        addLog(`🌐 API URL: ${API_URL}`, 'info');
         loadStatus();
     </script>
 </body>
 </html>
+
 
 
 

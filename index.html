@@ -6,6 +6,7 @@
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* ... ваш CSS (без изменений) ... */
         * {
             margin: 0;
             padding: 0;
@@ -721,9 +722,6 @@
             apple_tv: 'https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274'
         };
 
-        // Переменная для хранения зашифрованной ссылки
-        let encryptedSubscriptionUrl = '';
-
         // Проверка Telegram WebApp
         if (!window.Telegram || !window.Telegram.WebApp) {
             document.body.innerHTML = '<div style="padding: 20px; text-align: center; color: white; background: black;">❌ Ошибка: это приложение должно быть открыто через Telegram. Нажмите кнопку "Открыть приложение" в боте.</div>';
@@ -756,7 +754,7 @@
             return response.json();
         }
 
-        // Функция для шифрования ссылки через API
+        // Функция для шифрования ссылки через API (используется только при добавлении)
         async function encryptSubscriptionUrl(url) {
             if (!url) return url;
             
@@ -846,13 +844,8 @@
                 currentSubscriptionUrl = data.subscription_url || '';
                 console.log('🔗 Original subscription URL:', currentSubscriptionUrl);
                 
-                // Обновляем ссылку в профиле (без шифрования, оригинальная)
+                // Обновляем ссылку в профиле (всегда показываем оригинальную)
                 updateSubscriptionLink();
-                
-                // Получаем зашифрованную версию для будущего использования
-                if (currentSubscriptionUrl) {
-                    encryptedSubscriptionUrl = await encryptSubscriptionUrl(currentSubscriptionUrl);
-                }
                 
             } catch (e) {
                 console.error('❌ Error loading status:', e);
@@ -988,10 +981,10 @@
             }
 
             try {
-                // Используем зашифрованную ссылку, если есть, иначе оригинальную
-                const urlToOpen = encryptedSubscriptionUrl || currentSubscriptionUrl;
-                console.log('🚀 Opening URL in Happ:', urlToOpen);
-                tg.openLink(urlToOpen, { try_instant_view: false });
+                // Шифруем ссылку прямо перед открытием
+                const encryptedUrl = await encryptSubscriptionUrl(currentSubscriptionUrl);
+                console.log('🚀 Opening encrypted URL in Happ:', encryptedUrl);
+                tg.openLink(encryptedUrl, { try_instant_view: false });
                 nextStep();
             } catch (e) {
                 console.error('❌ Failed to open URL:', e);
@@ -1036,6 +1029,5 @@
     </script>
 </body>
 </html>
-
 
 

@@ -758,6 +758,9 @@
 
         // Функция для шифрования ссылки через API
         async function encryptSubscriptionUrl(url) {
+            if (!url) return url;
+            
+            console.log('🔐 Encrypting URL:', url);
             try {
                 const response = await fetchWithAuth(API_URL + '/api/encrypt_subscription', {
                     method: 'POST',
@@ -765,13 +768,15 @@
                     body: JSON.stringify({ url: url })
                 });
                 
+                console.log('📡 Encryption response:', response);
+                
                 if (response.encrypted_url) {
-                    console.log('URL encrypted successfully:', response.encryption_type || 'crypt4');
+                    console.log('✅ URL encrypted successfully:', response.encryption_type || 'crypt4');
                     return response.encrypted_url;
                 }
                 return url;
             } catch (e) {
-                console.error('Encryption error:', e);
+                console.error('❌ Encryption error:', e);
                 return url;
             }
         }
@@ -791,11 +796,6 @@
             // При показе экрана настройки, сбрасываем состояние шагов
             if (screenId === 'setupScreen') {
                 resetSetupScreen();
-            }
-            
-            // При показе профиля, обновляем ссылку
-            if (screenId === 'profileScreen') {
-                updateSubscriptionLink();
             }
         }
 
@@ -833,6 +833,7 @@
         async function loadStatus() {
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
+                console.log('📡 User status response:', data);
                 const statusEl = document.getElementById('statusText');
                 
                 if (data.subscription_end) {
@@ -843,15 +844,18 @@
                 }
                 
                 currentSubscriptionUrl = data.subscription_url || '';
+                console.log('🔗 Original subscription URL:', currentSubscriptionUrl);
                 
-                // Получаем зашифрованную версию для профиля
+                // Обновляем ссылку в профиле (без шифрования, оригинальная)
+                updateSubscriptionLink();
+                
+                // Получаем зашифрованную версию для будущего использования
                 if (currentSubscriptionUrl) {
                     encryptedSubscriptionUrl = await encryptSubscriptionUrl(currentSubscriptionUrl);
                 }
                 
-                // Обновляем ссылку в профиле, если он открыт
-                updateSubscriptionLink();
             } catch (e) {
+                console.error('❌ Error loading status:', e);
                 document.getElementById('statusText').innerText = 'Ошибка загрузки';
             }
         }
@@ -859,19 +863,19 @@
         function updateSubscriptionLink() {
             const linkDisplay = document.getElementById('subscriptionLinkDisplay');
             if (linkDisplay) {
-                linkDisplay.innerText = encryptedSubscriptionUrl || currentSubscriptionUrl || 'Ссылка ещё не получена';
+                // Показываем оригинальную ссылку для ручного копирования
+                linkDisplay.innerText = currentSubscriptionUrl || 'Ссылка ещё не получена';
             }
         }
 
         async function copySubscriptionLink() {
-            const textToCopy = encryptedSubscriptionUrl || currentSubscriptionUrl;
-            if (!textToCopy) {
+            if (!currentSubscriptionUrl) {
                 alert('Ссылка ещё не доступна');
                 return;
             }
             
             try {
-                await navigator.clipboard.writeText(textToCopy);
+                await navigator.clipboard.writeText(currentSubscriptionUrl);
                 alert('Ссылка скопирована!');
             } catch (e) {
                 alert('Не удалось скопировать ссылку');
@@ -984,12 +988,13 @@
             }
 
             try {
-                // Получаем зашифрованную ссылку через API
-                const encryptedUrl = await encryptSubscriptionUrl(currentSubscriptionUrl);
-                tg.openLink(encryptedUrl, { try_instant_view: false });
+                // Используем зашифрованную ссылку, если есть, иначе оригинальную
+                const urlToOpen = encryptedSubscriptionUrl || currentSubscriptionUrl;
+                console.log('🚀 Opening URL in Happ:', urlToOpen);
+                tg.openLink(urlToOpen, { try_instant_view: false });
                 nextStep();
             } catch (e) {
-                console.error('Failed to open encrypted URL:', e);
+                console.error('❌ Failed to open URL:', e);
                 nextStep();
             }
         }

@@ -647,7 +647,7 @@
         const SUPPORT_BOT_USERNAME = 'SupportBot';
         const USER_AGREEMENT_URL = 'https://telegra.ph/User-Agreement';
         const FAQ_URL = 'https://telegra.ph/FAQ-OmniVPN-01';
-        const REDIRECT_PAGE = 'https://omnivpn.us.ci/redirect.html'; // ЗАМЕНИТЕ НА ВАШ URL
+        const REDIRECT_PAGE = 'https://omnivpn.us.ci/redirect.html';
 
         const APP_LINKS = {
             android: 'https://play.google.com/store/apps/details?id=com.happproxy',
@@ -901,7 +901,6 @@
                 const encryptedUrl = await encryptSubscriptionUrl(currentSubscriptionUrl);
                 console.log('🔗 Encrypted URL:', encryptedUrl);
                 
-                // Открываем через страницу-редиректор
                 const redirectUrl = `${REDIRECT_PAGE}?url=${encodeURIComponent(encryptedUrl)}`;
                 tg.openLink(redirectUrl, { try_instant_view: false });
                 

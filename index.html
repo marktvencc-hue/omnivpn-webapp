@@ -311,7 +311,7 @@
             nextStep();
         }
 
-        // Функция добавления подписки через deep link Hiddify
+        // Функция добавления подписки через deep link Hiddify (исправлено)
         async function addSubscription() {
             if (!currentSubscriptionUrl) {
                 alert('Ссылка на подписку ещё не получена');
@@ -324,14 +324,12 @@
             btn.disabled = true;
 
             try {
-                // Создаём deep link для Hiddify
                 const encodedUrl = encodeURIComponent(currentSubscriptionUrl);
                 const hiddifyLink = `hiddify://import/${encodedUrl}`;
                 
-                // Пытаемся открыть deep link
-                window.location.href = hiddifyLink;
+                // Используем tg.openLink для открытия deep link
+                tg.openLink(hiddifyLink, { try_instant_view: false });
                 
-                // Даём время на открытие приложения и переходим к шагу 3
                 setTimeout(() => {
                     btn.innerText = originalText;
                     btn.disabled = false;

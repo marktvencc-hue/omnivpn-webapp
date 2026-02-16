@@ -643,13 +643,17 @@
                             </div>
                         </div>
                         
-                        <!-- Шаг 2 -->
+                        <!-- Шаг 2 (ИСПРАВЛЕН) -->
                         <div id="step2" class="hidden">
                             <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Добавьте подписку</p>
-                            <div style="display: none;" id="subscriptionUrlDisplay">Ссылка загружается...</div>
                             <div class="button-row">
                                 <button class="button-primary" onclick="addSubscriptionToHapp()">➕ Добавить</button>
                                 <button class="button" onclick="nextStep()">Далее →</button>
+                            </div>
+                            <!-- ТЕСТОВЫЕ КНОПКИ -->
+                            <div class="button-row" style="margin-top: 10px;">
+                                <button class="button" onclick="testSubscriptionLink()">🔍 Тест ссылки</button>
+                                <button class="button" onclick="copyCurrentSubscriptionUrl()">📋 Копировать</button>
                             </div>
                             <div style="display: none;" id="addStatus"></div>
                         </div>
@@ -974,21 +978,75 @@
             nextStep();
         }
 
+        // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ==========
         async function addSubscriptionToHapp() {
             if (!currentSubscriptionUrl) {
-                nextStep();
+                alert('Ссылка на подписку ещё не получена');
                 return;
             }
 
             try {
-                // Шифруем ссылку прямо перед открытием
+                // Показываем индикатор загрузки
+                const addButton = document.querySelector('#step2 .button-primary');
+                const originalText = addButton.innerText;
+                addButton.innerText = '⏳ Шифрование...';
+                addButton.disabled = true;
+                
+                // Шифруем ссылку
                 const encryptedUrl = await encryptSubscriptionUrl(currentSubscriptionUrl);
-                console.log('🚀 Opening encrypted URL in Happ:', encryptedUrl);
-                tg.openLink(encryptedUrl, { try_instant_view: false });
+                console.log('🔗 Encrypted URL:', encryptedUrl);
+                
+                // Определяем платформу
+                const platform = tg.platform;
+                console.log('📱 Platform:', platform);
+                
+                // Для мобильных устройств используем прямое открытие ссылки
+                if (platform === 'android' || platform === 'ios' || platform === 'ipados') {
+                    // Пробуем открыть через схему happ://
+                    tg.openLink(encryptedUrl, {
+                        try_instant_view: false
+                    });
+                } else {
+                    // Для десктопа открываем в новой вкладке
+                    window.open(encryptedUrl, '_blank');
+                }
+                
+                // Восстанавливаем кнопку
+                addButton.innerText = originalText;
+                addButton.disabled = false;
+                
+                // Переходим к следующему шагу
                 nextStep();
             } catch (e) {
                 console.error('❌ Failed to open URL:', e);
-                nextStep();
+                alert('Не удалось открыть ссылку. Попробуйте скопировать её вручную из профиля.');
+                
+                // Восстанавливаем кнопку
+                const addButton = document.querySelector('#step2 .button-primary');
+                if (addButton) {
+                    addButton.innerText = '➕ Добавить';
+                    addButton.disabled = false;
+                }
+            }
+        }
+
+        // ========== ТЕСТОВЫЕ ФУНКЦИИ ==========
+        function testSubscriptionLink() {
+            console.log('Current subscription URL:', currentSubscriptionUrl);
+            alert('Ссылка: ' + currentSubscriptionUrl);
+        }
+
+        async function copyCurrentSubscriptionUrl() {
+            if (!currentSubscriptionUrl) {
+                alert('Ссылка ещё не получена');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(currentSubscriptionUrl);
+                alert('✅ Оригинальная ссылка скопирована!\n\nЕсли не работает через кнопку, вставьте её вручную в приложении Happ');
+            } catch (e) {
+                alert('❌ Ошибка копирования');
             }
         }
 

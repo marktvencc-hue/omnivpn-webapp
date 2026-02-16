@@ -647,7 +647,7 @@
                             <p style="margin: 20px 0; color: rgba(255,255,255,0.8);">Добавьте подписку</p>
                             <div style="display: none;" id="subscriptionUrlDisplay">Ссылка загружается...</div>
                             <div class="button-row">
-                                <button class="button-primary" onclick="addSubscriptionToHapp()">Добавить</button>
+                                <button class="button-primary" onclick="addSubscriptionToHapp()">➕ Добавить</button>
                                 <button class="button" onclick="nextStep()">Далее →</button>
                             </div>
                             <div style="display: none;" id="addStatus"></div>
@@ -721,6 +721,9 @@
             apple_tv: 'https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274'
         };
 
+        // Переменная для хранения зашифрованной ссылки
+        let encryptedSubscriptionUrl = '';
+
         // Проверка Telegram WebApp
         if (!window.Telegram || !window.Telegram.WebApp) {
             document.body.innerHTML = '<div style="padding: 20px; text-align: center; color: white; background: black;">❌ Ошибка: это приложение должно быть открыто через Telegram. Нажмите кнопку "Открыть приложение" в боте.</div>';
@@ -751,6 +754,26 @@
             }
             
             return response.json();
+        }
+
+        // Функция для шифрования ссылки через API
+        async function encryptSubscriptionUrl(url) {
+            try {
+                const response = await fetchWithAuth(API_URL + '/api/encrypt_subscription', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+                
+                if (response.encrypted_url) {
+                    console.log('URL encrypted successfully:', response.encryption_type || 'crypt4');
+                    return response.encrypted_url;
+                }
+                return url;
+            } catch (e) {
+                console.error('Encryption error:', e);
+                return url;
+            }
         }
 
         function showScreen(screenId) {
@@ -821,6 +844,11 @@
                 
                 currentSubscriptionUrl = data.subscription_url || '';
                 
+                // Получаем зашифрованную версию для профиля
+                if (currentSubscriptionUrl) {
+                    encryptedSubscriptionUrl = await encryptSubscriptionUrl(currentSubscriptionUrl);
+                }
+                
                 // Обновляем ссылку в профиле, если он открыт
                 updateSubscriptionLink();
             } catch (e) {
@@ -831,18 +859,19 @@
         function updateSubscriptionLink() {
             const linkDisplay = document.getElementById('subscriptionLinkDisplay');
             if (linkDisplay) {
-                linkDisplay.innerText = currentSubscriptionUrl || 'Ссылка ещё не получена';
+                linkDisplay.innerText = encryptedSubscriptionUrl || currentSubscriptionUrl || 'Ссылка ещё не получена';
             }
         }
 
         async function copySubscriptionLink() {
-            if (!currentSubscriptionUrl) {
+            const textToCopy = encryptedSubscriptionUrl || currentSubscriptionUrl;
+            if (!textToCopy) {
                 alert('Ссылка ещё не доступна');
                 return;
             }
             
             try {
-                await navigator.clipboard.writeText(currentSubscriptionUrl);
+                await navigator.clipboard.writeText(textToCopy);
                 alert('Ссылка скопирована!');
             } catch (e) {
                 alert('Не удалось скопировать ссылку');
@@ -955,20 +984,12 @@
             }
 
             try {
-                // Формируем ссылку с правильной схемой для Happ
-                let happUrl;
-                if (currentSubscriptionUrl.startsWith('https://marzban.')) {
-                    // Если это ссылка на Marzban, используем happ://
-                    happUrl = 'happ://' + currentSubscriptionUrl.replace('https://', '');
-                } else if (currentSubscriptionUrl.startsWith('https://')) {
-                    happUrl = 'happ://' + currentSubscriptionUrl.substring(8);
-                } else {
-                    happUrl = currentSubscriptionUrl;
-                }
-                
-                tg.openLink(happUrl, { try_instant_view: false });
+                // Получаем зашифрованную ссылку через API
+                const encryptedUrl = await encryptSubscriptionUrl(currentSubscriptionUrl);
+                tg.openLink(encryptedUrl, { try_instant_view: false });
                 nextStep();
             } catch (e) {
+                console.error('Failed to open encrypted URL:', e);
                 nextStep();
             }
         }

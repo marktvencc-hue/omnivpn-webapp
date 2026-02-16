@@ -129,7 +129,7 @@
                         <div id="step2" class="hidden">
                             <p>Добавьте подписку</p>
                             <div class="button-row">
-                                <button class="button-primary" onclick="addSubscriptionToHapp()">➕ Добавить</button>
+                                <button class="button-primary" onclick="addSubscription()">➕ Добавить</button>
                                 <button class="button" onclick="nextStep()">Далее →</button>
                             </div>
                         </div>
@@ -179,17 +179,14 @@
         const SUPPORT_BOT_USERNAME = 'SupportBot';
         const USER_AGREEMENT_URL = 'https://telegra.ph/User-Agreement';
         const FAQ_URL = 'https://telegra.ph/FAQ-OmniVPN-01';
-        const REDIRECT_PAGE = 'https://omnivpn.us.ci/redirect.html';
 
         const APP_LINKS = {
-            android: 'https://play.google.com/store/apps/details?id=com.happproxy',
-            ios: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973',
-            ipados: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973',
-            windows: 'https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe',
-            macos: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973',
-            linux: 'https://github.com/Happ-proxy/happ-desktop/releases/latest/download/Happ.linux.x64.deb',
-            android_tv: 'https://play.google.com/store/apps/details?id=com.happproxy',
-            apple_tv: 'https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274'
+            android: 'https://app.hiddify.com/play',
+            ios: 'https://app.hiddify.com/ios',
+            ipados: 'https://app.hiddify.com/ios',
+            windows: 'https://app.hiddify.com/windows',
+            macos: 'https://app.hiddify.com/mac',
+            linux: 'https://app.hiddify.com/linux'
         };
 
         if (!window.Telegram || !window.Telegram.WebApp) {
@@ -214,20 +211,6 @@
                 throw new Error(error.error || `HTTP ${response.status}`);
             }
             return response.json();
-        }
-
-        async function encryptSubscriptionUrl(url) {
-            if (!url) return url;
-            try {
-                const response = await fetchWithAuth(API_URL + '/api/encrypt_subscription', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url })
-                });
-                return response.encrypted_url || url;
-            } catch {
-                return url;
-            }
         }
 
         function showScreen(screenId) {
@@ -327,31 +310,23 @@
             nextStep();
         }
 
-        // ⚠️ Диагностическая версия с алертами — после отладки уберите alert'ы
-        async function addSubscriptionToHapp() {
-            alert('1. Функция вызвана');
+        // Упрощённая функция добавления подписки: просто открываем ссылку
+        async function addSubscription() {
             if (!currentSubscriptionUrl) {
-                alert('Ошибка: нет ссылки');
+                alert('Ссылка на подписку ещё не получена');
                 return;
             }
-            alert('2. Ссылка есть: ' + currentSubscriptionUrl);
 
             const btn = document.querySelector('#step2 .button-primary');
             const originalText = btn.innerText;
-            btn.innerText = 'Шифрование...';
+            btn.innerText = 'Подключение...';
             btn.disabled = true;
 
             try {
-                alert('3. Отправляем запрос на шифрование');
-                const encrypted = await encryptSubscriptionUrl(currentSubscriptionUrl);
-                alert('4. Получен ответ: ' + encrypted);
+                // Открываем прямую ссылку на подписку
+                tg.openLink(currentSubscriptionUrl);
 
-                const redirectUrl = REDIRECT_PAGE + '?url=' + encodeURIComponent(encrypted);
-                alert('5. Redirect URL: ' + redirectUrl);
-
-                tg.openLink(redirectUrl, { try_instant_view: false });
-                alert('6. tg.openLink выполнен');
-
+                // Возвращаем кнопку в исходное состояние и переходим к шагу 3
                 btn.innerText = originalText;
                 btn.disabled = false;
                 setTimeout(() => nextStep(), 2000);

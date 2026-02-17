@@ -6,7 +6,8 @@
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* Все ваши исходные стили остаются без изменений */
+        /* Все исходные стили остаются без изменений, 
+           за исключением удаления анимации fadeIn для блоков */
         * {
             margin: 0;
             padding: 0;
@@ -540,14 +541,10 @@
             display: none !important;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .content-section > div {
+        /* Удалена анимация fadeIn, чтобы избежать мерцания */
+        /* .content-section > div {
             animation: fadeIn 0.25s ease-out;
-        }
+        } */
 
         .step-indicator {
             display: flex;
@@ -627,7 +624,7 @@
                         
                         <div class="profile-row">
                             <button class="button" onclick="showProfile()">👤 Профиль</button>
-                            <button class="faq-button" onclick="openFAQ()">❓ FAQ</button> <!-- теперь открывает внутренний экран -->
+                            <button class="faq-button" onclick="openFAQ()">❓ FAQ</button>
                         </div>
                     </div>
                 </div>
@@ -694,7 +691,7 @@
                     </div>
                 </div>
 
-                <!-- Экран пользовательского соглашения (без изменений) -->
+                <!-- Экран пользовательского соглашения -->
                 <div id="agreementScreen" class="hidden">
                     <h3 style="text-align: left; padding-left: 0; margin-bottom: 16px;">Пользовательское соглашение</h3>
                     <div class="agreement-content">
@@ -731,7 +728,7 @@
                         <h4>8. Контактные данные</h4>
                         <p>По всем вопросам, включая запросы на возврат средств, вы можете обратиться в службу поддержки.</p>
                     </div>
-                    <button class="button secondary back-button" onclick="backToProfileFromAgreement()">← Назад в профиль</button>
+                    <button class="button secondary back-button" onclick="backToProfile()">← Назад</button>
                 </div>
 
                 <!-- НОВЫЙ ЭКРАН: Часто задаваемые вопросы (FAQ) -->
@@ -767,7 +764,8 @@
                             <div class="faq-answer">На данный момент доступны серверы в следующих странах: Финляндия.</div>
                         </div>
                     </div>
-                    <button class="button secondary back-button" onclick="backToMainFromFAQ()">← На главную</button>
+                    <!-- Кнопка возврата теперь с текстом "← Назад" и ведёт на главный экран -->
+                    <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
                 </div>
 
                 <!-- Рефералы -->
@@ -791,8 +789,6 @@
     <script>
         const API_URL = 'https://omnivpn.us.ci';
         const SUPPORT_BOT_USERNAME = 'SupportBot';
-        // Внешняя ссылка больше не нужна для FAQ, но оставим для других целей
-        const FAQ_URL = 'https://telegra.ph/FAQ-OmniVPN-01'; // больше не используется
 
         const APP_LINKS = {
             android: 'https://app.hiddify.com/play',
@@ -828,7 +824,7 @@
         }
 
         function showScreen(screenId) {
-            // Добавили faqScreen в список скрываемых
+            // Скрываем все экраны
             document.querySelectorAll('#mainScreen, #tariffsScreen, #setupScreen, #profileScreen, #referralScreen, #transactionsScreen, #agreementScreen, #faqScreen').forEach(el => el.classList.add('hidden'));
             document.getElementById(screenId).classList.remove('hidden');
             if (screenId === 'setupScreen') resetSetupScreen();
@@ -844,8 +840,6 @@
 
         function backToMain() { showScreen('mainScreen'); loadStatus(); }
         function backToProfile() { showScreen('profileScreen'); }
-        function backToProfileFromAgreement() { showScreen('profileScreen'); }
-        function backToMainFromFAQ() { showScreen('mainScreen'); } // возврат из FAQ
 
         function updateStepIndicators(step) {
             document.querySelectorAll('.step').forEach((el, i) => {
@@ -900,7 +894,7 @@
         function showTransactions() { showScreen('transactionsScreen'); loadTransactions(); }
 
         function openAgreement() { showScreen('agreementScreen'); }
-        function openFAQ() { showScreen('faqScreen'); } // теперь открывает внутренний экран
+        function openFAQ() { showScreen('faqScreen'); }
 
         async function buyTariff(tariff) {
             try {
@@ -1013,4 +1007,3 @@
     </script>
 </body>
 </html>
-

@@ -120,7 +120,7 @@
                     </div>
                     <div id="setupSteps" class="hidden">
                         <div id="step1" class="hidden">
-                            <p>Установите приложение Hiddify</p>
+                            <p>Установите приложение</p>
                             <div class="button-row">
                                 <button class="button-primary" onclick="installApp()">Установить</button>
                                 <button class="button" onclick="nextStep()">Далее →</button>
@@ -134,7 +134,7 @@
                             </div>
                         </div>
                         <div id="step3" class="hidden">
-                            <p>Готово! Включите подключение в Hiddify</p>
+                            <p>Готово! Включите подключение в приложении</p>
                             <button class="button-primary" onclick="finishSetup()">Завершить</button>
                         </div>
                     </div>
@@ -147,7 +147,7 @@
                         <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
                         <button class="button" onclick="openSupport()">🆘 Поддержка</button>
                         <button class="button" onclick="showTransactions()">📜 Транзакции</button>
-                        <button class="button" onclick="openAgreement()">📄 Соглашение</button>
+                        <button class="button" onclick="openAgreement()">📄 Пользовательское соглашение</button>
                         <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
                     </div>
                     <div class="manual-link-container">
@@ -180,11 +180,11 @@
         const USER_AGREEMENT_URL = 'https://telegra.ph/User-Agreement';
         const FAQ_URL = 'https://telegra.ph/FAQ-OmniVPN-01';
 
-        // Ссылки на скачивание Hiddify
+        // Ссылки на скачивание
         const APP_LINKS = {
             android: 'https://app.hiddify.com/play',
-            ios: 'https://app.hiddify.com/ios',
-            ipados: 'https://app.hiddify.com/ios',
+            ios: 'https://apps.apple.com/ru/app/v2box-v2ray-client/id6446814690',
+            ipados: 'https://apps.apple.com/ru/app/v2box-v2ray-client/id6446814690',
             windows: 'https://app.hiddify.com/windows',
             macos: 'https://app.hiddify.com/mac',
             linux: 'https://app.hiddify.com/linux'
@@ -240,9 +240,28 @@
         async function loadStatus() {
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
-                document.getElementById('statusText').innerText = data.subscription_end
-                    ? `Подписка активна до ${new Date(data.subscription_end).toLocaleDateString()}`
-                    : 'Не активирована • 3 дня бесплатно';
+                const statusEl = document.getElementById('statusText');
+                
+                if (data.is_unlimited) {
+                    statusEl.innerText = 'Подписка бессрочная';
+                } else if (data.subscription_end) {
+                    const endDate = new Date(data.subscription_end);
+                    const today = new Date();
+                    const diffTime = endDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    let daysText = '';
+                    if (diffDays > 0) {
+                        daysText = ` (осталось ${diffDays} дн.)`;
+                    } else if (diffDays === 0) {
+                        daysText = ' (последний день)';
+                    } else {
+                        daysText = ' (истекла)';
+                    }
+                    statusEl.innerText = `Подписка активна до ${endDate.toLocaleDateString()}${daysText}`;
+                } else {
+                    statusEl.innerText = 'Не активирована • 3 дня бесплатно';
+                }
+                
                 currentSubscriptionUrl = data.subscription_url || '';
             } catch (e) {
                 document.getElementById('statusText').innerText = 'Ошибка загрузки';
@@ -311,7 +330,6 @@
             nextStep();
         }
 
-        // Безопасное открытие deep link через создание и клик по ссылке
         async function addSubscription() {
             if (!currentSubscriptionUrl) {
                 alert('Ссылка на подписку ещё не получена');
@@ -325,18 +343,24 @@
 
             try {
                 const encodedUrl = encodeURIComponent(currentSubscriptionUrl);
-                const hiddifyLink = `hiddify://import/${encodedUrl}`;
+                // Выбираем deep link в зависимости от платформы
+                let deepLink;
+                if (tg.platform === 'ios' || tg.platform === 'ipados') {
+                    // V2Box
+                    deepLink = `v2box://install-sub?url=${encodedUrl}`; // возможно, другой формат
+                } else {
+                    // Hiddify и другие
+                    deepLink = `hiddify://import/${encodedUrl}`;
+                }
 
-                // Создаём невидимую ссылку и эмулируем клик
                 const link = document.createElement('a');
-                link.href = hiddifyLink;
+                link.href = deepLink;
                 link.target = '_blank';
                 link.style.display = 'none';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
 
-                // Даём время на открытие приложения и переходим к шагу 3
                 setTimeout(() => {
                     btn.innerText = originalText;
                     btn.disabled = false;

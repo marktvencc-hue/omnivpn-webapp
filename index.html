@@ -6,7 +6,7 @@
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* ... (все ваши старые стили остаются без изменений) ... */
+        /* Все ваши исходные стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -407,16 +407,17 @@
             text-align: center;
         }
 
-        /* NEW: заголовок профиля слева */
+        /* заголовок профиля слева */
         .profile-title {
             text-align: left;
-            padding-left: 0;        /* убираем лишний отступ, если нужен – можно добавить */
+            padding-left: 0;
             margin-bottom: 16px;
             font-size: 24px;
         }
 
-        /* NEW: стили для экрана соглашения */
-        .agreement-content {
+        /* стили для экрана соглашения и FAQ (общие) */
+        .agreement-content,
+        .faq-content {
             background: rgba(255,255,255,0.03);
             border-radius: 20px;
             padding: 20px;
@@ -430,30 +431,69 @@
             scrollbar-width: thin;
             scrollbar-color: rgba(255,255,255,0.3) transparent;
         }
-        .agreement-content h4 {
+
+        .agreement-content h4,
+        .faq-content h4 {
             font-size: 16px;
             font-weight: 600;
             margin: 20px 0 10px;
             color: #fff;
         }
-        .agreement-content h4:first-of-type {
+
+        .agreement-content h4:first-of-type,
+        .faq-content h4:first-of-type {
             margin-top: 0;
         }
-        .agreement-content p {
+
+        .agreement-content p,
+        .faq-content p {
             margin: 12px 0;
             color: rgba(255,255,255,0.8);
         }
-        .agreement-content strong {
+
+        .agreement-content strong,
+        .faq-content strong {
             color: #fff;
             font-weight: 600;
         }
-        .agreement-content ul, .agreement-content ol {
+
+        .agreement-content ul,
+        .agreement-content ol,
+        .faq-content ul,
+        .faq-content ol {
             padding-left: 20px;
             margin: 8px 0;
         }
-        .agreement-content li {
+
+        .agreement-content li,
+        .faq-content li {
             margin: 4px 0;
         }
+
+        /* дополнительное оформление для FAQ */
+        .faq-item {
+            margin-bottom: 20px;
+        }
+        .faq-question {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .faq-question::before {
+            content: "❓";
+            opacity: 0.7;
+            font-size: 14px;
+        }
+        .faq-answer {
+            color: rgba(255,255,255,0.8);
+            padding-left: 24px;
+            border-left: 2px solid rgba(255,255,255,0.15);
+            margin-top: 4px;
+        }
+
         .back-button {
             margin-top: 8px;
         }
@@ -487,10 +527,6 @@
             border-bottom: 1px dashed rgba(255,255,255,0.3);
             padding-bottom: 1px;
             font-size: 13px;
-        }
-
-        .back-button {
-            margin-top: 16px;
         }
 
         #deviceHint {
@@ -591,7 +627,7 @@
                         
                         <div class="profile-row">
                             <button class="button" onclick="showProfile()">👤 Профиль</button>
-                            <button class="faq-button" onclick="openFAQ()">❓ FAQ</button>
+                            <button class="faq-button" onclick="openFAQ()">❓ FAQ</button> <!-- теперь открывает внутренний экран -->
                         </div>
                     </div>
                 </div>
@@ -644,12 +680,11 @@
 
                 <!-- Профиль (с заголовком слева) -->
                 <div id="profileScreen" class="hidden">
-                    <h3 class="profile-title">Профиль</h3> <!-- NEW: выравнивание влево -->
+                    <h3 class="profile-title">Профиль</h3>
                     <div class="actions-container">
                         <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
                         <button class="button" onclick="openSupport()">🆘 Поддержка</button>
                         <button class="button" onclick="showTransactions()">📜 Транзакции</button>
-                        <!-- Кнопка теперь открывает внутренний экран, а не внешнюю ссылку -->
                         <button class="button" onclick="openAgreement()">📄 Пользовательское соглашение</button>
                         <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
                     </div>
@@ -659,7 +694,7 @@
                     </div>
                 </div>
 
-                <!-- NEW: Экран пользовательского соглашения -->
+                <!-- Экран пользовательского соглашения (без изменений) -->
                 <div id="agreementScreen" class="hidden">
                     <h3 style="text-align: left; padding-left: 0; margin-bottom: 16px;">Пользовательское соглашение</h3>
                     <div class="agreement-content">
@@ -699,6 +734,42 @@
                     <button class="button secondary back-button" onclick="backToProfileFromAgreement()">← Назад в профиль</button>
                 </div>
 
+                <!-- НОВЫЙ ЭКРАН: Часто задаваемые вопросы (FAQ) -->
+                <div id="faqScreen" class="hidden">
+                    <h3 style="text-align: left; padding-left: 0; margin-bottom: 16px;">Часто задаваемые вопросы</h3>
+                    <div class="faq-content">
+                        <div class="faq-item">
+                            <div class="faq-question">Как подключиться к OmniVPN?</div>
+                            <div class="faq-answer">Вам необходимо добавить ключ в приложение Hiddify, v2RayTun или другое совместимое приложение. Приложения и подробную инструкцию по подключению вы можете найти в меню, пункт «Установка и настройка».</div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">Не работает VPN / медленная скорость.</div>
+                            <div class="faq-answer">Проверьте, включён ли на вашем устройстве режим VPN (Туннель). Если соединение отсутствует на всех серверах или возникают частые обрывы, попробуйте сменить протокол подключения или обратитесь в поддержку.</div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">Сколько длится пробный период?</div>
+                            <div class="faq-answer">Пробный период составляет <strong>3 дня</strong> с момента первой авторизации в приложении.</div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">Где узнать цену? Как приобрести подписку?</div>
+                            <div class="faq-answer">Актуальные цены и возможность покупки доступны в главном меню, пункт «Купить подписку». Оплата принимается звёздами Telegram.</div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">Потерял ключ. Где его найти?</div>
+                            <div class="faq-answer">Ваш актуальный ключ всегда доступен в разделе «Профиль».</div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">Как выбрать нужный сервер в приложении?</div>
+                            <div class="faq-answer">В приложении Hiddify (или аналогичном) после подключения откройте раздел «Прокси» или «Серверы» и выберите нужную локацию из списка доступных.</div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">Какие локации доступны в OmniVPN?</div>
+                            <div class="faq-answer">На данный момент доступны серверы в следующих странах: Финляндия.</div>
+                        </div>
+                    </div>
+                    <button class="button secondary back-button" onclick="backToMainFromFAQ()">← На главную</button>
+                </div>
+
                 <!-- Рефералы -->
                 <div id="referralScreen" class="hidden">
                     <h3>Реферальная программа</h3>
@@ -720,8 +791,8 @@
     <script>
         const API_URL = 'https://omnivpn.us.ci';
         const SUPPORT_BOT_USERNAME = 'SupportBot';
-        // Внешние ссылки больше не используются для соглашения, но оставим для FAQ
-        const FAQ_URL = 'https://telegra.ph/FAQ-OmniVPN-01';
+        // Внешняя ссылка больше не нужна для FAQ, но оставим для других целей
+        const FAQ_URL = 'https://telegra.ph/FAQ-OmniVPN-01'; // больше не используется
 
         const APP_LINKS = {
             android: 'https://app.hiddify.com/play',
@@ -757,8 +828,8 @@
         }
 
         function showScreen(screenId) {
-            // NEW: добавили agreementScreen в список скрываемых
-            document.querySelectorAll('#mainScreen, #tariffsScreen, #setupScreen, #profileScreen, #referralScreen, #transactionsScreen, #agreementScreen').forEach(el => el.classList.add('hidden'));
+            // Добавили faqScreen в список скрываемых
+            document.querySelectorAll('#mainScreen, #tariffsScreen, #setupScreen, #profileScreen, #referralScreen, #transactionsScreen, #agreementScreen, #faqScreen').forEach(el => el.classList.add('hidden'));
             document.getElementById(screenId).classList.remove('hidden');
             if (screenId === 'setupScreen') resetSetupScreen();
         }
@@ -773,8 +844,8 @@
 
         function backToMain() { showScreen('mainScreen'); loadStatus(); }
         function backToProfile() { showScreen('profileScreen'); }
-        // NEW: возврат из соглашения в профиль
         function backToProfileFromAgreement() { showScreen('profileScreen'); }
+        function backToMainFromFAQ() { showScreen('mainScreen'); } // возврат из FAQ
 
         function updateStepIndicators(step) {
             document.querySelectorAll('.step').forEach((el, i) => {
@@ -828,8 +899,8 @@
         function showReferral() { showScreen('referralScreen'); loadReferralInfo(); }
         function showTransactions() { showScreen('transactionsScreen'); loadTransactions(); }
 
-        // NEW: внутреннее открытие соглашения
         function openAgreement() { showScreen('agreementScreen'); }
+        function openFAQ() { showScreen('faqScreen'); } // теперь открывает внутренний экран
 
         async function buyTariff(tariff) {
             try {
@@ -937,9 +1008,9 @@
 
         function finishSetup() { backToMain(); }
         function openSupport() { tg.openTelegramLink('https://t.me/' + SUPPORT_BOT_USERNAME); }
-        function openFAQ() { tg.openLink(FAQ_URL); }
 
         loadStatus();
     </script>
 </body>
 </html>
+

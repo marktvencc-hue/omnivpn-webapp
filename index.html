@@ -6,7 +6,7 @@
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* Все предыдущие стили остаются, добавляем новые для статуса */
+        /* Все предыдущие стили без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -172,7 +172,7 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
-        /* НОВЫЕ СТИЛИ ДЛЯ КРАСИВОГО СТАТУС-БАРА */
+        /* Стили для статус-бара (без изменений) */
         .status-text {
             margin-bottom: 20px;
         }
@@ -830,7 +830,7 @@
                     <button class="button secondary back-button" onclick="backToAbout()">← Назад</button>
                 </div>
 
-                <!-- Экран Контактная информация (копирование почты) -->
+                <!-- Экран Контактная информация -->
                 <div id="contactScreen" class="hidden">
                     <h3 style="text-align: left; padding-left: 0; margin-bottom: 16px;">Контактная информация</h3>
                     <div class="agreement-content" style="text-align: center;">
@@ -1004,7 +1004,7 @@
             });
         }
 
-        // КРАСИВЫЙ СТАТУС-БАР С ИЕРАРХИЕЙ ТЕКСТА
+        // ИСПРАВЛЕННЫЙ СТАТУС-БАР (УБРАНО ДУБЛИРОВАНИЕ ДАТЫ)
         async function loadStatus() {
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
@@ -1013,7 +1013,6 @@
                 let html = '';
 
                 if (data.is_unlimited) {
-                    // Бессрочная подписка
                     html = `
                         <div class="status-modern">
                             <div class="status-header">
@@ -1055,6 +1054,7 @@
                         statusText = 'Заканчивается';
                     }
                     
+                    // Для активной подписки (diffDays >= 0) убираем нижнюю строку с датой
                     if (diffDays >= 0) {
                         html = `
                             <div class="status-modern">
@@ -1071,13 +1071,11 @@
                                     </span>
                                     <span class="status-date-small">до ${formattedDate}</span>
                                 </div>
-                                <div class="status-info-row">
-                                    <span>Окончание: ${formattedDate}</span>
-                                </div>
+                                <!-- Нижняя строка убрана, чтобы не дублировать дату -->
                             </div>
                         `;
                     } else {
-                        // истекла
+                        // Для истекшей подписки оставляем нижнюю строку с советом
                         html = `
                             <div class="status-modern">
                                 <div class="status-header">

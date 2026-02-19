@@ -6,7 +6,7 @@
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-     
+        /* Все стили без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -177,32 +177,91 @@
             font-weight: 400;
             line-height: 1.5;
             text-align: center;
-            padding: 16px 0 16px;
+            padding: 0;
             margin-bottom: 16px;
             border-bottom: none;
-            background: rgba(255,255,255,0.02);
+            background: transparent;
             border-radius: 20px;
             color: rgba(255,255,255,0.9);
         }
 
-        .status-main {
-            display: block;
-            font-size: 16px;
-            font-weight: 500;
-            letter-spacing: 0.2px;
-            color: rgba(255,255,255,0.95);
+        .status-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
+            border-radius: 24px;
+            padding: 20px 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
-        .status-extra {
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .status-icon {
+            font-size: 32px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+        }
+
+        .status-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            background: linear-gradient(90deg, #fff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-days-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .status-days-number {
+            font-size: 42px;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+            text-shadow: 0 2px 10px rgba(255,255,255,0.2);
+        }
+
+        .status-days-label {
+            font-size: 16px;
+            color: rgba(255,255,255,0.6);
+            font-weight: 400;
+        }
+
+        .status-date {
+            font-size: 15px;
+            color: rgba(255,255,255,0.7);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .status-date-icon {
+            font-size: 18px;
+            opacity: 0.7;
+        }
+
+        .status-badge {
             display: inline-block;
-            margin-top: 6px;
-            font-size: 14px;
-            font-weight: 300;
-            color: rgba(255,255,255,0.5);
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.1);
             padding: 4px 12px;
-            border-radius: 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.9);
             backdrop-filter: blur(4px);
+            margin-top: 8px;
         }
 
         .button {
@@ -583,6 +642,25 @@
             border-color: rgba(255,255,255,0.2);
             color: rgba(255,255,255,0.7);
         }
+
+        /* Стиль для кликабельного email */
+        .clickable-email {
+            color: white;
+            font-size: 18px;
+            text-decoration: underline;
+            cursor: pointer;
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.05);
+            transition: background 0.2s;
+        }
+        .clickable-email:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .clickable-email:active {
+            transform: scale(0.97);
+        }
     </style>
 </head>
 <body>
@@ -673,7 +751,6 @@
                         <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
                         <button class="button" onclick="openSupport()">🆘 Поддержка</button>
                         <button class="button" onclick="showTransactions()">📜 Транзакции</button>
-                        <!-- Заменяем кнопку пользовательского соглашения на "О сервисе" -->
                         <button class="button" onclick="showAbout()">ℹ️ О сервисе</button>
                         <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
                     </div>
@@ -683,7 +760,7 @@
                     </div>
                 </div>
 
-                <!-- Экран О сервисе (новый) -->
+                <!-- Экран О сервисе -->
                 <div id="aboutScreen" class="hidden">
                     <h3 class="profile-title">О сервисе</h3>
                     <div class="actions-container">
@@ -694,7 +771,7 @@
                     </div>
                 </div>
 
-                <!-- Экран Политика конфиденциальности (новый) -->
+                <!-- Экран Политика конфиденциальности -->
                 <div id="privacyScreen" class="hidden">
                     <h3 style="text-align: left; padding-left: 0; margin-bottom: 16px;">Политика конфиденциальности</h3>
                     <div class="agreement-content">
@@ -743,19 +820,20 @@
                     <button class="button secondary back-button" onclick="backToAbout()">← Назад</button>
                 </div>
 
-                <!-- Экран Контактная информация (новый) -->
+                <!-- Экран Контактная информация (обновлён: копирование почты) -->
                 <div id="contactScreen" class="hidden">
                     <h3 style="text-align: left; padding-left: 0; margin-bottom: 16px;">Контактная информация</h3>
                     <div class="agreement-content" style="text-align: center;">
                         <p>Если у вас возникли вопросы, напишите нам:</p>
-                        <p><a href="#" id="contactEmailLink" style="color: white; font-size: 18px; text-decoration: underline;">support@omnivpn.us.ci</a></p>
-                        <p>Нажмите на адрес, чтобы открыть почтовый клиент.</p>
-                        <p>Письмо будет автоматически содержать информацию о вашем устройстве и аккаунте для более быстрой помощи.</p>
+                        <p>
+                            <span class="clickable-email" onclick="copyEmail()">support@omnivpn.us.ci</span>
+                        </p>
+                        <p>Нажмите на адрес, чтобы скопировать.</p>
                     </div>
                     <button class="button secondary back-button" onclick="backToAbout()">← Назад</button>
                 </div>
 
-                <!-- Экран пользовательского соглашения (с изменённым текстом) -->
+                <!-- Экран пользовательского соглашения -->
                 <div id="agreementScreen" class="hidden">
                     <h3 style="text-align: left; padding-left: 0; margin-bottom: 16px;">Пользовательское соглашение</h3>
                     <div class="agreement-content">
@@ -796,7 +874,7 @@
                     <button class="button secondary back-button" onclick="backToAbout()">← Назад</button>
                 </div>
 
-                <!-- FAQ (без изменений) -->
+                <!-- FAQ -->
                 <div id="faqScreen" class="hidden">
                     <h3 style="text-align: left; padding-left: 0; margin-bottom: 16px;">Часто задаваемые вопросы</h3>
                     <div class="faq-content">
@@ -853,7 +931,7 @@
     <script>
         const API_URL = 'https://omnivpn.us.ci';
         const SUPPORT_BOT_USERNAME = 'omnivpnhelpbot';
-        const SUPPORT_EMAIL = 'support@omnivpn.us.ci'; // исправленный адрес
+        const SUPPORT_EMAIL = 'support@omnivpn.us.ci';
 
         const APP_LINKS = {
             android: 'https://app.hiddify.com/play',
@@ -892,7 +970,6 @@
             document.querySelectorAll('#mainScreen, #tariffsScreen, #setupScreen, #profileScreen, #referralScreen, #transactionsScreen, #agreementScreen, #faqScreen, #aboutScreen, #privacyScreen, #contactScreen').forEach(el => el.classList.add('hidden'));
             document.getElementById(screenId).classList.remove('hidden');
             if (screenId === 'setupScreen') resetSetupScreen();
-            if (screenId === 'contactScreen') updateContactEmailLink(); // обновляем ссылку при показе контактов
         }
 
         function resetSetupScreen() {
@@ -907,7 +984,6 @@
         function backToProfile() { showScreen('profileScreen'); }
         function backToAbout() { showScreen('aboutScreen'); }
 
-        // Новые функции для навигации
         function showAbout() { showScreen('aboutScreen'); }
         function showPrivacy() { showScreen('privacyScreen'); }
         function showContact() { showScreen('contactScreen'); }
@@ -925,30 +1001,102 @@
                 
                 let html = '';
                 if (data.is_unlimited) {
-                    html = '<span class="status-main">Подписка бессрочная</span>';
+                    html = `
+                        <div class="status-card">
+                            <div class="status-header">
+                                <span class="status-icon">♾️</span>
+                                <span class="status-title">Бессрочная подписка</span>
+                            </div>
+                            <div class="status-days-row">
+                                <span class="status-days-number">∞</span>
+                                <span class="status-days-label">неограниченно</span>
+                            </div>
+                            <div class="status-date">
+                                <span class="status-date-icon">📅</span>
+                                <span>Действует бессрочно</span>
+                            </div>
+                            <span class="status-badge">Премиум статус</span>
+                        </div>
+                    `;
                 } else if (data.subscription_end) {
                     const endDate = new Date(data.subscription_end);
                     const today = new Date();
                     const diffTime = endDate - today;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    const formattedDate = endDate.toLocaleDateString('ru-RU', { 
+                        day: 'numeric', 
+                        month: 'long', 
+                        year: 'numeric' 
+                    }).replace(' г.', '');
+                    
                     let daysText = '';
+                    let icon = '';
+                    let statusTitle = 'Подписка активна';
+                    
                     if (diffDays > 0) {
-                        daysText = `осталось ${diffDays} дн.`;
+                        daysText = `${diffDays} дн.`;
+                        icon = '✅';
                     } else if (diffDays === 0) {
                         daysText = 'последний день';
+                        icon = '⏳';
+                        statusTitle = 'Подписка заканчивается';
                     } else {
                         daysText = 'истекла';
+                        icon = '❌';
+                        statusTitle = 'Подписка истекла';
                     }
-                    const formattedDate = endDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).replace(' г.', '');
-                    html = `<span class="status-main">Активна до ${formattedDate}</span>
-                            <span class="status-extra">${daysText}</span>`;
+                    
+                    html = `
+                        <div class="status-card">
+                            <div class="status-header">
+                                <span class="status-icon">${icon}</span>
+                                <span class="status-title">${statusTitle}</span>
+                            </div>
+                            <div class="status-days-row">
+                                <span class="status-days-number">${diffDays > 0 ? diffDays : '0'}</span>
+                                <span class="status-days-label">дней осталось</span>
+                            </div>
+                            <div class="status-date">
+                                <span class="status-date-icon">📅</span>
+                                <span>Действует до ${formattedDate}</span>
+                            </div>
+                            ${diffDays < 0 ? '<span class="status-badge">Требуется продление</span>' : '<span class="status-badge">Активно</span>'}
+                        </div>
+                    `;
                 } else {
-                    html = '<span class="status-main">Не активирована</span><span class="status-extra">3 дня бесплатно</span>';
+                    html = `
+                        <div class="status-card">
+                            <div class="status-header">
+                                <span class="status-icon">⏳</span>
+                                <span class="status-title">Нет активной подписки</span>
+                            </div>
+                            <div class="status-days-row">
+                                <span class="status-days-number">3</span>
+                                <span class="status-days-label">дня бесплатно</span>
+                            </div>
+                            <div class="status-date">
+                                <span class="status-date-icon">✨</span>
+                                <span>Активируйте пробный период</span>
+                            </div>
+                            <span class="status-badge">Триал доступен</span>
+                        </div>
+                    `;
                 }
                 statusEl.innerHTML = html;
                 currentSubscriptionUrl = data.subscription_url || '';
             } catch (e) {
-                document.getElementById('statusText').innerHTML = '<span class="status-main">Ошибка загрузки</span>';
+                document.getElementById('statusText').innerHTML = `
+                    <div class="status-card">
+                        <div class="status-header">
+                            <span class="status-icon">⚠️</span>
+                            <span class="status-title">Ошибка загрузки</span>
+                        </div>
+                        <div class="status-date">
+                            <span>Не удалось получить статус</span>
+                        </div>
+                    </div>
+                `;
             }
         }
 
@@ -956,6 +1104,16 @@
             if (!currentSubscriptionUrl) { alert('Ссылка ещё не доступна'); return; }
             try { await navigator.clipboard.writeText(currentSubscriptionUrl); alert('✅ Ссылка скопирована!'); }
             catch { alert('❌ Не удалось скопировать'); }
+        }
+
+        // Новая функция для копирования почты
+        function copyEmail() {
+            const email = SUPPORT_EMAIL;
+            navigator.clipboard.writeText(email).then(() => {
+                alert('✅ Email скопирован: ' + email);
+            }).catch(() => {
+                alert('❌ Не удалось скопировать email');
+            });
         }
 
         function showTariffs() { showScreen('tariffsScreen'); }
@@ -1074,27 +1232,9 @@
         function finishSetup() { backToMain(); }
         function openSupport() { tg.openTelegramLink('https://t.me/' + SUPPORT_BOT_USERNAME); }
 
-        // Функция для обновления ссылки mailto с данными пользователя
-        function updateContactEmailLink() {
-            const user = tg.initDataUnsafe?.user;
-            let body = 'Информация о пользователе:\n';
-            if (user) {
-                body += `ID: ${user.id}\n`;
-                body += `Имя: ${user.first_name || ''} ${user.last_name || ''}\n`;
-                body += `Username: @${user.username || 'не указан'}\n`;
-                body += `Язык: ${user.language_code || 'не указан'}\n`;
-            } else {
-                body += 'Данные пользователя недоступны\n';
-            }
-            body += `Платформа: ${tg.platform || 'неизвестно'}\n`;
-            body += `Версия приложения: Telegram WebApp`;
-            
-            const mailtoLink = `mailto:${SUPPORT_EMAIL}?subject=Вопрос%20о%20сервисе%20OmniVPN&body=${encodeURIComponent(body)}`;
-            document.getElementById('contactEmailLink').href = mailtoLink;
-        }
-
-        // Инициализация
         loadStatus();
     </script>
 </body>
 </html>
+</html>
+

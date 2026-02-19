@@ -6,7 +6,7 @@
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* Все стили без изменений */
+        /* Все предыдущие стили остаются, кроме старых стилей статус-бара */
         * {
             margin: 0;
             padding: 0;
@@ -172,96 +172,81 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
+        /* НОВЫЕ СТИЛИ ДЛЯ СТАТУС-БАРА */
         .status-text {
-            font-size: 16px;
-            font-weight: 400;
-            line-height: 1.5;
-            text-align: center;
-            padding: 0;
-            margin-bottom: 16px;
-            border-bottom: none;
-            background: transparent;
-            border-radius: 20px;
-            color: rgba(255,255,255,0.9);
+            margin-bottom: 20px;
         }
 
-        .status-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
-            border-radius: 24px;
-            padding: 20px 16px;
+        .status-modern {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 18px 16px;
             border: 1px solid rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
-        .status-header {
+        .status-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .status-icon {
-            font-size: 32px;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
-        }
-
-        .status-title {
-            font-size: 18px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            background: linear-gradient(90deg, #fff, #e0e0e0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .status-days-row {
-            display: flex;
-            align-items: baseline;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            font-size: 15px;
         }
 
-        .status-days-number {
-            font-size: 42px;
-            font-weight: 700;
-            color: white;
-            line-height: 1;
-            text-shadow: 0 2px 10px rgba(255,255,255,0.2);
+        .status-row:last-child {
+            margin-bottom: 0;
         }
 
-        .status-days-label {
-            font-size: 16px;
-            color: rgba(255,255,255,0.6);
+        .status-label {
+            color: rgba(255,255,255,0.5);
             font-weight: 400;
         }
 
-        .status-date {
-            font-size: 15px;
-            color: rgba(255,255,255,0.7);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 8px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+        .status-value {
+            color: white;
+            font-weight: 500;
         }
 
-        .status-date-icon {
-            font-size: 18px;
-            opacity: 0.7;
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 10px;
+            margin-right: 8px;
+        }
+
+        .status-indicator-green {
+            background-color: #4cd964;
+            box-shadow: 0 0 8px #4cd964;
+        }
+
+        .status-indicator-yellow {
+            background-color: #ffcc00;
+            box-shadow: 0 0 8px #ffcc00;
+        }
+
+        .status-indicator-red {
+            background-color: #ff3b30;
+            box-shadow: 0 0 8px #ff3b30;
+        }
+
+        .status-indicator-gray {
+            background-color: #8e8e93;
+            box-shadow: 0 0 8px #8e8e93;
         }
 
         .status-badge {
-            display: inline-block;
             background: rgba(255,255,255,0.1);
-            padding: 4px 12px;
-            border-radius: 30px;
+            padding: 4px 10px;
+            border-radius: 20px;
             font-size: 13px;
-            font-weight: 500;
-            color: rgba(255,255,255,0.9);
-            backdrop-filter: blur(4px);
-            margin-top: 8px;
+            color: white;
+        }
+
+        .status-compact-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .button {
@@ -643,7 +628,6 @@
             color: rgba(255,255,255,0.7);
         }
 
-        /* Стиль для кликабельного email */
         .clickable-email {
             color: white;
             font-size: 18px;
@@ -820,7 +804,7 @@
                     <button class="button secondary back-button" onclick="backToAbout()">← Назад</button>
                 </div>
 
-                <!-- Экран Контактная информация (обновлён: копирование почты) -->
+                <!-- Экран Контактная информация (копирование почты) -->
                 <div id="contactScreen" class="hidden">
                     <h3 style="text-align: left; padding-left: 0; margin-bottom: 16px;">Контактная информация</h3>
                     <div class="agreement-content" style="text-align: center;">
@@ -994,28 +978,29 @@
             });
         }
 
+        // ОБНОВЛЁННАЯ ФУНКЦИЯ ЗАГРУЗКИ СТАТУСА (НОВЫЙ ДИЗАЙН)
         async function loadStatus() {
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
                 const statusEl = document.getElementById('statusText');
                 
                 let html = '';
+
                 if (data.is_unlimited) {
+                    // Бессрочная подписка
                     html = `
-                        <div class="status-card">
-                            <div class="status-header">
-                                <span class="status-icon">♾️</span>
-                                <span class="status-title">Бессрочная подписка</span>
+                        <div class="status-modern">
+                            <div class="status-row">
+                                <span class="status-label">Статус</span>
+                                <span class="status-value status-compact-row">
+                                    <span class="status-indicator status-indicator-green"></span>
+                                    Бессрочная
+                                </span>
                             </div>
-                            <div class="status-days-row">
-                                <span class="status-days-number">∞</span>
-                                <span class="status-days-label">неограниченно</span>
+                            <div class="status-row">
+                                <span class="status-label">Тип</span>
+                                <span class="status-value">Премиум навсегда</span>
                             </div>
-                            <div class="status-date">
-                                <span class="status-date-icon">📅</span>
-                                <span>Действует бессрочно</span>
-                            </div>
-                            <span class="status-badge">Премиум статус</span>
                         </div>
                     `;
                 } else if (data.subscription_end) {
@@ -1030,56 +1015,52 @@
                         year: 'numeric' 
                     }).replace(' г.', '');
                     
-                    let daysText = '';
-                    let icon = '';
-                    let statusTitle = 'Подписка активна';
+                    let indicatorClass = 'status-indicator-green';
+                    let statusText = 'Активна';
                     
-                    if (diffDays > 0) {
-                        daysText = `${diffDays} дн.`;
-                        icon = '✅';
-                    } else if (diffDays === 0) {
-                        daysText = 'последний день';
-                        icon = '⏳';
-                        statusTitle = 'Подписка заканчивается';
-                    } else {
-                        daysText = 'истекла';
-                        icon = '❌';
-                        statusTitle = 'Подписка истекла';
+                    if (diffDays < 0) {
+                        indicatorClass = 'status-indicator-red';
+                        statusText = 'Истекла';
+                    } else if (diffDays <= 3) {
+                        indicatorClass = 'status-indicator-yellow';
+                        statusText = 'Заканчивается';
                     }
                     
                     html = `
-                        <div class="status-card">
-                            <div class="status-header">
-                                <span class="status-icon">${icon}</span>
-                                <span class="status-title">${statusTitle}</span>
+                        <div class="status-modern">
+                            <div class="status-row">
+                                <span class="status-label">Статус</span>
+                                <span class="status-value status-compact-row">
+                                    <span class="status-indicator ${indicatorClass}"></span>
+                                    ${statusText}
+                                </span>
                             </div>
-                            <div class="status-days-row">
-                                <span class="status-days-number">${diffDays > 0 ? diffDays : '0'}</span>
-                                <span class="status-days-label">дней осталось</span>
+                            <div class="status-row">
+                                <span class="status-label">Действует до</span>
+                                <span class="status-value">${formattedDate}</span>
                             </div>
-                            <div class="status-date">
-                                <span class="status-date-icon">📅</span>
-                                <span>Действует до ${formattedDate}</span>
-                            </div>
-                            ${diffDays < 0 ? '<span class="status-badge">Требуется продление</span>' : '<span class="status-badge">Активно</span>'}
+                            ${diffDays >= 0 ? `
+                            <div class="status-row">
+                                <span class="status-label">Осталось дней</span>
+                                <span class="status-value">${diffDays}</span>
+                            </div>` : ''}
                         </div>
                     `;
                 } else {
+                    // Нет подписки
                     html = `
-                        <div class="status-card">
-                            <div class="status-header">
-                                <span class="status-icon">⏳</span>
-                                <span class="status-title">Нет активной подписки</span>
+                        <div class="status-modern">
+                            <div class="status-row">
+                                <span class="status-label">Статус</span>
+                                <span class="status-value status-compact-row">
+                                    <span class="status-indicator status-indicator-gray"></span>
+                                    Нет подписки
+                                </span>
                             </div>
-                            <div class="status-days-row">
-                                <span class="status-days-number">3</span>
-                                <span class="status-days-label">дня бесплатно</span>
+                            <div class="status-row">
+                                <span class="status-label">Пробный период</span>
+                                <span class="status-value">3 дня</span>
                             </div>
-                            <div class="status-date">
-                                <span class="status-date-icon">✨</span>
-                                <span>Активируйте пробный период</span>
-                            </div>
-                            <span class="status-badge">Триал доступен</span>
                         </div>
                     `;
                 }
@@ -1087,13 +1068,10 @@
                 currentSubscriptionUrl = data.subscription_url || '';
             } catch (e) {
                 document.getElementById('statusText').innerHTML = `
-                    <div class="status-card">
-                        <div class="status-header">
-                            <span class="status-icon">⚠️</span>
-                            <span class="status-title">Ошибка загрузки</span>
-                        </div>
-                        <div class="status-date">
-                            <span>Не удалось получить статус</span>
+                    <div class="status-modern">
+                        <div class="status-row">
+                            <span class="status-label">Ошибка</span>
+                            <span class="status-value">Не удалось загрузить статус</span>
                         </div>
                     </div>
                 `;
@@ -1106,7 +1084,6 @@
             catch { alert('❌ Не удалось скопировать'); }
         }
 
-        // Новая функция для копирования почты
         function copyEmail() {
             const email = SUPPORT_EMAIL;
             navigator.clipboard.writeText(email).then(() => {
@@ -1236,5 +1213,3 @@
     </script>
 </body>
 </html>
-</html>
-

@@ -6,7 +6,7 @@
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* Все предыдущие стили остаются, кроме старых стилей статус-бара */
+        /* Все предыдущие стили остаются, добавляем новые для статуса */
         * {
             margin: 0;
             padding: 0;
@@ -172,81 +172,107 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
-        /* НОВЫЕ СТИЛИ ДЛЯ СТАТУС-БАРА */
+        /* НОВЫЕ СТИЛИ ДЛЯ КРАСИВОГО СТАТУС-БАРА */
         .status-text {
             margin-bottom: 20px;
         }
 
         .status-modern {
             background: rgba(255,255,255,0.05);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 18px 16px;
             border: 1px solid rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
         }
 
-        .status-row {
+        .status-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 15px;
-        }
-
-        .status-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .status-label {
-            color: rgba(255,255,255,0.5);
-            font-weight: 400;
-        }
-
-        .status-value {
-            color: white;
-            font-weight: 500;
+            margin-bottom: 12px;
         }
 
         .status-indicator {
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
             width: 10px;
             height: 10px;
             border-radius: 10px;
-            margin-right: 8px;
         }
 
-        .status-indicator-green {
+        .status-dot-green {
             background-color: #4cd964;
             box-shadow: 0 0 8px #4cd964;
         }
 
-        .status-indicator-yellow {
+        .status-dot-yellow {
             background-color: #ffcc00;
             box-shadow: 0 0 8px #ffcc00;
         }
 
-        .status-indicator-red {
+        .status-dot-red {
             background-color: #ff3b30;
             box-shadow: 0 0 8px #ff3b30;
         }
 
-        .status-indicator-gray {
+        .status-dot-gray {
             background-color: #8e8e93;
             box-shadow: 0 0 8px #8e8e93;
+        }
+
+        .status-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: white;
         }
 
         .status-badge {
             background: rgba(255,255,255,0.1);
             padding: 4px 10px;
             border-radius: 20px;
-            font-size: 13px;
-            color: white;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
         }
 
-        .status-compact-row {
+        .status-main-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .status-days-large {
+            font-size: 38px;
+            font-weight: 600;
+            color: white;
+            line-height: 1;
+        }
+
+        .status-days-unit {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            margin-left: 4px;
+        }
+
+        .status-date-small {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            text-align: right;
+        }
+
+        .status-info-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 10px;
+            padding-top: 10px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
         }
 
         .button {
@@ -978,7 +1004,7 @@
             });
         }
 
-        // ОБНОВЛЁННАЯ ФУНКЦИЯ ЗАГРУЗКИ СТАТУСА (НОВЫЙ ДИЗАЙН)
+        // КРАСИВЫЙ СТАТУС-БАР С ИЕРАРХИЕЙ ТЕКСТА
         async function loadStatus() {
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
@@ -990,16 +1016,19 @@
                     // Бессрочная подписка
                     html = `
                         <div class="status-modern">
-                            <div class="status-row">
-                                <span class="status-label">Статус</span>
-                                <span class="status-value status-compact-row">
-                                    <span class="status-indicator status-indicator-green"></span>
-                                    Бессрочная
-                                </span>
+                            <div class="status-header">
+                                <div class="status-indicator">
+                                    <span class="status-dot status-dot-green"></span>
+                                    <span class="status-label">Бессрочная</span>
+                                </div>
+                                <span class="status-badge">Премиум</span>
                             </div>
-                            <div class="status-row">
-                                <span class="status-label">Тип</span>
-                                <span class="status-value">Премиум навсегда</span>
+                            <div class="status-main-row">
+                                <span class="status-days-large">∞</span>
+                                <span class="status-date-small">Навсегда</span>
+                            </div>
+                            <div class="status-info-row">
+                                <span>Действует бессрочно</span>
                             </div>
                         </div>
                     `;
@@ -1015,51 +1044,75 @@
                         year: 'numeric' 
                     }).replace(' г.', '');
                     
-                    let indicatorClass = 'status-indicator-green';
+                    let dotClass = 'status-dot-green';
                     let statusText = 'Активна';
                     
                     if (diffDays < 0) {
-                        indicatorClass = 'status-indicator-red';
+                        dotClass = 'status-dot-red';
                         statusText = 'Истекла';
                     } else if (diffDays <= 3) {
-                        indicatorClass = 'status-indicator-yellow';
+                        dotClass = 'status-dot-yellow';
                         statusText = 'Заканчивается';
                     }
                     
-                    html = `
-                        <div class="status-modern">
-                            <div class="status-row">
-                                <span class="status-label">Статус</span>
-                                <span class="status-value status-compact-row">
-                                    <span class="status-indicator ${indicatorClass}"></span>
-                                    ${statusText}
-                                </span>
+                    if (diffDays >= 0) {
+                        html = `
+                            <div class="status-modern">
+                                <div class="status-header">
+                                    <div class="status-indicator">
+                                        <span class="status-dot ${dotClass}"></span>
+                                        <span class="status-label">${statusText}</span>
+                                    </div>
+                                </div>
+                                <div class="status-main-row">
+                                    <span>
+                                        <span class="status-days-large">${diffDays}</span>
+                                        <span class="status-days-unit">дней</span>
+                                    </span>
+                                    <span class="status-date-small">до ${formattedDate}</span>
+                                </div>
+                                <div class="status-info-row">
+                                    <span>Окончание: ${formattedDate}</span>
+                                </div>
                             </div>
-                            <div class="status-row">
-                                <span class="status-label">Действует до</span>
-                                <span class="status-value">${formattedDate}</span>
+                        `;
+                    } else {
+                        // истекла
+                        html = `
+                            <div class="status-modern">
+                                <div class="status-header">
+                                    <div class="status-indicator">
+                                        <span class="status-dot status-dot-red"></span>
+                                        <span class="status-label">Истекла</span>
+                                    </div>
+                                </div>
+                                <div class="status-main-row">
+                                    <span class="status-days-large">0</span>
+                                    <span class="status-date-small">до ${formattedDate}</span>
+                                </div>
+                                <div class="status-info-row">
+                                    <span>Требуется продление</span>
+                                </div>
                             </div>
-                            ${diffDays >= 0 ? `
-                            <div class="status-row">
-                                <span class="status-label">Осталось дней</span>
-                                <span class="status-value">${diffDays}</span>
-                            </div>` : ''}
-                        </div>
-                    `;
+                        `;
+                    }
                 } else {
                     // Нет подписки
                     html = `
                         <div class="status-modern">
-                            <div class="status-row">
-                                <span class="status-label">Статус</span>
-                                <span class="status-value status-compact-row">
-                                    <span class="status-indicator status-indicator-gray"></span>
-                                    Нет подписки
-                                </span>
+                            <div class="status-header">
+                                <div class="status-indicator">
+                                    <span class="status-dot status-dot-gray"></span>
+                                    <span class="status-label">Нет подписки</span>
+                                </div>
+                                <span class="status-badge">Триал 3 дня</span>
                             </div>
-                            <div class="status-row">
-                                <span class="status-label">Пробный период</span>
-                                <span class="status-value">3 дня</span>
+                            <div class="status-main-row">
+                                <span class="status-days-large">3</span>
+                                <span class="status-date-small">дня бесплатно</span>
+                            </div>
+                            <div class="status-info-row">
+                                <span>Активируйте пробный период</span>
                             </div>
                         </div>
                     `;
@@ -1069,9 +1122,11 @@
             } catch (e) {
                 document.getElementById('statusText').innerHTML = `
                     <div class="status-modern">
-                        <div class="status-row">
-                            <span class="status-label">Ошибка</span>
-                            <span class="status-value">Не удалось загрузить статус</span>
+                        <div class="status-header">
+                            <span class="status-label">Ошибка загрузки</span>
+                        </div>
+                        <div class="status-main-row">
+                            <span>Повторите позже</span>
                         </div>
                     </div>
                 `;

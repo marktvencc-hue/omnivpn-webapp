@@ -23,6 +23,8 @@
             --overlay-bg: rgba(0,0,0,0.7);
             --card-bg: rgba(255,255,255,0.05);
             --card-active-bg: rgba(255,255,255,0.15);
+            --disabled-bg: rgba(255,255,255,0.1);
+            --disabled-text: rgba(255,255,255,0.3);
         }
 
         .theme-light {
@@ -42,6 +44,8 @@
             --overlay-bg: rgba(255,255,255,0.7);
             --card-bg: rgba(0,0,0,0.03);
             --card-active-bg: rgba(0,0,0,0.1);
+            --disabled-bg: rgba(0,0,0,0.05);
+            --disabled-text: rgba(0,0,0,0.2);
         }
 
         * {
@@ -373,10 +377,19 @@
             -webkit-backdrop-filter: blur(5px);
         }
 
-        .button-primary:hover {
+        .button-primary:hover:not(:disabled) {
             background: var(--primary-bg);
             filter: brightness(1.1);
             transform: scale(0.98);
+        }
+
+        .button-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--disabled-bg);
+            color: var(--disabled-text);
+            transform: none;
+            filter: none;
         }
 
         .button.secondary {
@@ -481,8 +494,8 @@
             color: var(--secondary-text);
         }
 
-        /* Кнопка оплаты (используем button-primary) */
-        .pay-button {
+        /* Кнопка оплаты (вынесена из actions-container) */
+        .pay-button-container {
             margin-top: 8px;
         }
 
@@ -929,8 +942,12 @@
                                 <div class="tariff-price">849 ₽</div>
                             </div>
                         </div>
+                        <!-- Кнопка "Оплатить" больше не внутри actions-container, а вынесена вниз -->
+                    </div>
 
-                        <button class="button-primary pay-button" id="payButton" disabled>💳 Оплатить</button>
+                    <!-- Контейнер для кнопок под контейнером -->
+                    <div class="pay-button-container">
+                        <button class="button-primary" id="payButton" disabled onclick="handlePayClick()">Оплатить</button>
                     </div>
                     <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
                 </div>
@@ -970,8 +987,8 @@
                 </div>
 
                 <div id="profileScreen" class="hidden">
-                    <!-- Версия изменена на 2.4 -->
-                    <div class="profile-version">Версия 2.4</div>
+                    <!-- Версия изменена на 2.401 -->
+                    <div class="profile-version">Версия 2.401</div>
                     <h3 class="profile-title">Профиль</h3>
                     <div class="actions-container">
                         <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
@@ -1292,12 +1309,14 @@
             });
         });
 
-        // Кнопка оплаты
-        payButton.addEventListener('click', () => {
-            if (selectedTariff) {
-                openPaymentSheet();
+        // Обработчик нажатия на кнопку "Оплатить" (с проверкой)
+        function handlePayClick() {
+            if (!selectedTariff) {
+                alert('Сначала нужно выбрать тариф');
+                return;
             }
-        });
+            openPaymentSheet();
+        }
 
         // Bottom Sheet
         const overlay = document.getElementById('overlay');
@@ -1505,3 +1524,4 @@
     </script>
 </body>
 </html>
+

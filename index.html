@@ -486,7 +486,7 @@
             margin-top: 8px;
         }
 
-        /* Bottom Sheet (всплывающее меню) в стиле главного меню */
+        /* Bottom Sheet (всплывающее меню) */
         .overlay {
             position: fixed;
             top: 0;
@@ -496,14 +496,14 @@
             background: var(--overlay-bg);
             backdrop-filter: blur(4px);
             z-index: 2000;
-            display: none;
             opacity: 0;
+            pointer-events: none;
             transition: opacity 0.3s ease;
         }
 
         .overlay.active {
-            display: block;
             opacity: 1;
+            pointer-events: auto;
         }
 
         .bottom-sheet {
@@ -564,6 +564,18 @@
 
         .payment-option-icon {
             font-size: 22px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-option-icon img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            display: block;
         }
 
         .payment-option-text {
@@ -923,7 +935,7 @@
                     <button class="button secondary back-button" onclick="backToMain()">← Назад</button>
                 </div>
 
-                <!-- Остальные экраны (без изменений) -->
+                <!-- Остальные экраны -->
                 <div id="setupScreen" class="hidden">
                     <h3 id="deviceHint">Установка на устройство</h3>
                     <div class="step-indicator">
@@ -958,7 +970,8 @@
                 </div>
 
                 <div id="profileScreen" class="hidden">
-                    <div class="profile-version">Версия 2.323</div>
+                    <!-- Версия изменена на 2.4 -->
+                    <div class="profile-version">Версия 2.4</div>
                     <h3 class="profile-title">Профиль</h3>
                     <div class="actions-container">
                         <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
@@ -1139,22 +1152,37 @@
     <div class="bottom-sheet" id="paymentSheet">
         <div class="sheet-handle"></div>
         <div class="sheet-title">Выберите способ оплаты</div>
-        <div class="payment-option" onclick="payWithCard()">
-            <span class="payment-option-icon">💳</span>
-            <span class="payment-option-text">Банковская карта</span>
-        </div>
+
+        <!-- 1. СБП -->
         <div class="payment-option" onclick="payWithSBP()">
-            <span class="payment-option-icon">🏦</span>
-            <span class="payment-option-text">СБП</span>
+            <span class="payment-option-icon">
+                <img src="https://cdn.freekassa.net/images/currencies/light_small_logo_44.png" alt="СБП">
+            </span>
+            <span class="payment-option-text">Оплата по СБП</span>
         </div>
+
+        <!-- 2. Sber Pay -->
         <div class="payment-option" onclick="payWithSberPay()">
-            <span class="payment-option-icon">💎</span>
-            <span class="payment-option-text">SberPay</span>
+            <span class="payment-option-icon">
+                <img src="https://cdn.freekassa.net/images/currencies/light_small_logo_43.png" alt="Sber Pay">
+            </span>
+            <span class="payment-option-text">Sber Pay</span>
         </div>
+
+        <!-- 3. Telegram Stars -->
         <div class="payment-option" onclick="payWithStars()">
             <span class="payment-option-icon">⭐</span>
             <span class="payment-option-text">Telegram Stars</span>
         </div>
+
+        <!-- 4. Оплата картой -->
+        <div class="payment-option" onclick="payWithCard()">
+            <span class="payment-option-icon">
+                <img src="https://cdn.freekassa.net/images/currencies/light_small_logo_36.png" alt="Карта">
+            </span>
+            <span class="payment-option-text">Оплата картой</span>
+        </div>
+
         <div class="close-sheet" onclick="closePaymentSheet()">Закрыть</div>
     </div>
 

@@ -749,7 +749,7 @@
  
     <!-- Переключатель темы (только на главном) -->
     <div class="theme-switcher" id="themeSwitcher">
-        <div class="theme-button" id="themeToggle">🟒</div> <!-- по умолчанию белый квадрат (тема dark) -->
+        <div class="theme-button" id="themeToggle">⚪</div> <!-- белый кружок для тёмной темы -->
     </div>
 
     <div class="app">
@@ -832,8 +832,8 @@
                 </div>
 
                 <div id="profileScreen" class="hidden">
-                    <!-- Версия приложения на экране профиля -->
-                    <div class="profile-version">Версия 2.32</div>
+                    <!-- Версия приложения на экране профиля (увеличена на 0.001) -->
+                    <div class="profile-version">Версия 2.321</div>
                     <h3 class="profile-title">Профиль</h3>
                     <div class="actions-container">
                         <button class="button" onclick="showReferral()">🎁 Реферальная программа</button>
@@ -1053,11 +1053,11 @@
             if (theme === 'light') {
                 body.classList.add('theme-light');
                 logoImg.src = LOGO_BLACK;
-                themeToggle.textContent = '🌑'; // черный круг для светлой темы (указывает на темную тему при клике)
+                themeToggle.textContent = '🌑'; // черный круг для светлой темы (указывает на тёмную тему при клике)
             } else { 
                 body.classList.add('theme-dark');
                 logoImg.src = LOGO_WHITE;
-                themeToggle.textContent = '🟒'; // белый квадрат для темной темы (указывает на светлую тему при клике)
+                themeToggle.textContent = '⚪'; // белый кружок для тёмной темы (указывает на светлую тему при клике)
             }
 
             localStorage.setItem('selectedTheme', theme);

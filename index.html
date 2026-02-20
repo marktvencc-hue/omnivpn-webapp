@@ -6,7 +6,7 @@
     <title>OmniVPN</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* CSS-переменные для тем (без изменений) */
+        /* CSS-переменные для тем */
         :root {
             --bg-color: #000000;
             --text-color: #ffffff;
@@ -21,8 +21,6 @@
             --status-bg: rgba(255,255,255,0.03);
             --wave-border: rgba(255,255,255,0.1);
             --wave-glow: rgba(255,255,255,0.03);
-            --theme-icon-bg: rgba(255,255,255,0.1);
-            --theme-icon-color: #ffffff;
             --theme-menu-bg: rgba(30,30,30,0.95);
             --theme-menu-item-hover: rgba(255,255,255,0.1);
         }
@@ -41,8 +39,6 @@
             --status-bg: rgba(0,0,0,0.02);
             --wave-border: rgba(0,0,0,0.1);
             --wave-glow: rgba(0,0,0,0.03);
-            --theme-icon-bg: rgba(0,0,0,0.1);
-            --theme-icon-color: #000000;
             --theme-menu-bg: rgba(245,245,245,0.98);
             --theme-menu-item-hover: rgba(0,0,0,0.05);
         }
@@ -98,6 +94,7 @@
             50% { transform: scale(1.05); opacity: 0.95; }
         }
 
+        /* Маленькая кнопка без фона */
         .theme-switcher {
             position: fixed;
             top: 16px;
@@ -109,26 +106,24 @@
         }
 
         .theme-button {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--theme-icon-bg);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             cursor: pointer;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            transition: transform 0.2s, background-color 0.2s;
-            color: var(--theme-icon-color);
+            color: var(--text-color);
+            transition: opacity 0.2s;
+            background: none;
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            padding: 0;
         }
 
         .theme-button:hover {
-            transform: scale(1.05);
-            background: var(--button-hover-bg);
+            opacity: 0.8;
         }
 
         .theme-menu {
@@ -138,7 +133,7 @@
             -webkit-backdrop-filter: blur(20px);
             border-radius: 24px;
             padding: 8px 0;
-            min-width: 160px;
+            min-width: 140px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
             border: 1px solid var(--border-color);
             opacity: 0;
@@ -154,8 +149,8 @@
         }
 
         .theme-option {
-            padding: 12px 20px;
-            font-size: 16px;
+            padding: 10px 16px;
+            font-size: 15px;
             color: var(--text-color);
             cursor: pointer;
             transition: background-color 0.2s;
@@ -174,7 +169,7 @@
         }
 
         .theme-option span {
-            font-size: 20px;
+            font-size: 18px;
         }
 
         .app {
@@ -784,12 +779,12 @@
     </style>
 </head>
 <body>
+    <!-- Переключатель темы: только две опции -->
     <div class="theme-switcher">
-        <div class="theme-button" id="themeToggle">💡</div>
+        <div class="theme-button" id="themeToggle">☀️</div> <!-- Иконка по умолчанию (будет заменена JS) -->
         <div class="theme-menu" id="themeMenu">
             <div class="theme-option" data-theme="dark"><span>🌙</span> Тёмная</div>
             <div class="theme-option" data-theme="light"><span>☀️</span> Светлая</div>
-            <div class="theme-option" data-theme="system"><span>⚙️</span> Системная</div>
         </div>
     </div>
 
@@ -797,7 +792,6 @@
         <div class="content-wrapper">
             <div class="logo-section">
                 <div class="logo-wrapper">
-                    <!-- Логотип: теперь с ID для динамической смены src -->
                     <img src="https://raw.githubusercontent.com/marktvencc-hue/omnivpn-webapp/main/photo_5226932146939826416_c.png" alt="OmniVPN" class="logo-image" id="logoImg">
                     <div class="wave-container">
                         <div class="wave wave-1"></div>
@@ -1086,17 +1080,17 @@
         let currentStep = 1;
         let currentSubscriptionUrl = '';
 
-        // Элемент логотипа
         const logoImg = document.getElementById('logoImg');
         const LOGO_WHITE = 'https://raw.githubusercontent.com/marktvencc-hue/omnivpn-webapp/main/photo_5226932146939826416_c.png';
         const LOGO_BLACK = 'https://raw.githubusercontent.com/marktvencc-hue/omnivpn-webapp/main/photo_5226932146939826416_cBLACK.png';
 
-        // ========== Логика переключения темы ==========
+        // ========== Переключатель темы (только тёмная/светлая) ==========
         const themeToggle = document.getElementById('themeToggle');
         const themeMenu = document.getElementById('themeMenu');
         const themeOptions = document.querySelectorAll('.theme-option');
         const body = document.body;
 
+        // Закрытие меню при клике вне
         document.addEventListener('click', (e) => {
             if (!themeToggle.contains(e.target) && !themeMenu.contains(e.target)) {
                 themeMenu.classList.remove('show');
@@ -1115,18 +1109,11 @@
             if (theme === 'light') {
                 body.classList.add('theme-light');
                 logoImg.src = LOGO_BLACK;
-            } else if (theme === 'dark') {
+                themeToggle.textContent = '🌙'; // луна для светлой темы
+            } else { // dark по умолчанию
                 body.classList.add('theme-dark');
                 logoImg.src = LOGO_WHITE;
-            } else if (theme === 'system') {
-                const systemTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-                if (systemTheme === 'light') {
-                    body.classList.add('theme-light');
-                    logoImg.src = LOGO_BLACK;
-                } else {
-                    body.classList.add('theme-dark');
-                    logoImg.src = LOGO_WHITE;
-                }
+                themeToggle.textContent = '☀️'; // солнце для тёмной темы
             }
 
             localStorage.setItem('selectedTheme', theme);
@@ -1141,25 +1128,14 @@
             themeMenu.classList.remove('show');
         }
 
-        const savedTheme = localStorage.getItem('selectedTheme') || 'dark';
+        // Инициализация: если нет сохранённой темы или была system, ставим dark
+        let savedTheme = localStorage.getItem('selectedTheme');
+        if (savedTheme !== 'light' && savedTheme !== 'dark') {
+            savedTheme = 'dark';
+        }
         setTheme(savedTheme);
 
-        const systemMediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-        systemMediaQuery.addEventListener('change', (e) => {
-            const currentTheme = localStorage.getItem('selectedTheme');
-            if (currentTheme === 'system') {
-                if (e.matches) {
-                    body.classList.remove('theme-dark');
-                    body.classList.add('theme-light');
-                    logoImg.src = LOGO_BLACK;
-                } else {
-                    body.classList.remove('theme-light');
-                    body.classList.add('theme-dark');
-                    logoImg.src = LOGO_WHITE;
-                }
-            }
-        });
-
+        // Обработчики пунктов меню
         themeOptions.forEach(opt => {
             opt.addEventListener('click', () => {
                 setTheme(opt.dataset.theme);

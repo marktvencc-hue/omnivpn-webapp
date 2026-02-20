@@ -172,15 +172,15 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
-        /* СТАТУС-БАР С ТОЧНЫМИ ПРОПОРЦИЯМИ И ШРИФТАМИ */
+        /* НОВЫЙ СТАТУС-БАР */
         .status-text {
-            margin-bottom: 16px; /* чуть уменьшил отступ */
+            margin-bottom: 16px;
         }
 
         .status-ultima {
             background: rgba(255,255,255,0.03);
             border-radius: 24px;
-            padding: 16px 16px; /* минимальные отступы */
+            padding: 16px 16px;
             border: 1px solid rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
             display: flex;
@@ -190,69 +190,81 @@
 
         .status-header-line {
             display: flex;
-            align-items: baseline; /* выравнивание по базовой линии */
+            align-items: baseline;
             justify-content: space-between;
             width: 100%;
-            margin-bottom: 8px; /* небольшой отступ до статуса */
+            margin-bottom: 8px;
             gap: 8px;
         }
 
         .status-service-name {
-            flex: 1; /* занимает доступное место, но ограничим пропорции */
-            max-width: 25%; /* не более 25% */
-            font-size: clamp(18px, 5vw, 22px); /* чуть меньше, чем дата */
-            font-weight: 300; /* тонкий */
-            letter-spacing: 1.5px; /* увеличенное расстояние между буквами */
+            flex: 1;
+            max-width: 25%;
+            font-size: clamp(20px, 6vw, 26px);
+            font-weight: 400; /* обычный, но буквы заглавные */
+            letter-spacing: 1px;
             color: white;
             line-height: 1.2;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            text-transform: uppercase; /* большие буквы */
         }
 
         .status-expiry {
-            flex: 3; /* занимает 75% */
-            font-size: clamp(16px, 4.5vw, 20px);
-            font-weight: 500; /* умеренно жирный */
+            flex: 3;
+            font-size: clamp(14px, 4vw, 18px);
+            font-weight: 500;
             color: rgba(255,255,255,0.5);
             text-align: right;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
-        .status-center {
+        .status-right-block {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: flex-end; /* выравнивание по правому краю */
             width: 100%;
         }
 
-        .status-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.1);
-            padding: 4px 14px;
-            border-radius: 30px;
-            font-size: clamp(13px, 3.8vw, 15px);
-            color: white;
-            backdrop-filter: blur(4px);
-            text-align: center;
+        .status-badge-large {
+            font-size: clamp(20px, 6vw, 26px);
             font-weight: 400;
+            color: white;
+            background-color: #1e3a2e; /* тёмно-зелёный */
+            padding: 6px 16px;
+            border-radius: 30px;
+            display: inline-block;
+            text-align: center;
+            line-height: 1.3;
+            margin-top: 4px;
+            text-transform: uppercase; /* для PREMIUM, но для русских фраз не обязательно, но можно */
+            letter-spacing: 0.5px;
+            max-width: 100%;
+            word-break: break-word;
         }
 
-        /* Адаптация для очень маленьких экранов */
-        @media (max-width: 360px) {
+        /* Адаптация для узких экранов */
+        @media (max-width: 400px) {
+            .status-header-line {
+                flex-wrap: wrap;
+            }
             .status-service-name {
-                font-size: 16px;
-                letter-spacing: 1px;
+                max-width: 100%;
+                font-size: 22px;
             }
             .status-expiry {
-                font-size: 14px;
+                text-align: left;
+                width: 100%;
             }
-            .status-badge {
-                font-size: 12px;
-                padding: 3px 10px;
+            .status-right-block {
+                align-items: flex-start;
+            }
+            .status-badge-large {
+                font-size: 20px;
+                padding: 4px 12px;
             }
         }
 
@@ -971,7 +983,11 @@
             updateStepIndicators(1);
         }
 
-        function backToMain() { showScreen('mainScreen'); loadStatus(); }
+        function backToMain() { 
+            showScreen('mainScreen'); 
+            // Не вызываем loadStatus здесь, чтобы избежать мигания
+        }
+
         function backToProfile() { showScreen('profileScreen'); }
         function backToAbout() { showScreen('aboutScreen'); }
 
@@ -985,19 +1001,18 @@
             });
         }
 
-        // СТАТУС-БАР С ОБНОВЛЁННЫМИ СТИЛЯМИ (логика та же)
+        // Функция обновления статуса
         async function loadStatus() {
             try {
                 const data = await fetchWithAuth(API_URL + '/api/user_status');
                 const statusEl = document.getElementById('statusText');
                 
-                let html = '';
                 let expiryText = '';
                 let statusText = '';
 
                 if (data.is_unlimited) {
                     expiryText = 'бессрочный доступ';
-                    statusText = 'премиум';
+                    statusText = 'PREMIUM';
                 } else if (data.subscription_end) {
                     const endDate = new Date(data.subscription_end);
                     const today = new Date();
@@ -1013,23 +1028,23 @@
                     expiryText = `до ${formattedDate}`;
                     
                     if (diffDays >= 0) {
-                        statusText = 'активна';
+                        statusText = 'Активная подписка';
                     } else {
-                        statusText = 'не активна';
+                        statusText = 'Не активна';
                     }
                 } else {
                     expiryText = '3 дня';
-                    statusText = 'пробный период';
+                    statusText = 'Нет подписки';
                 }
 
-                html = `
+                const html = `
                     <div class="status-ultima">
                         <div class="status-header-line">
-                            <span class="status-service-name">Omni</span>
+                            <span class="status-service-name">OMNI</span>
                             <span class="status-expiry">${expiryText}</span>
                         </div>
-                        <div class="status-center">
-                            <span class="status-badge">${statusText}</span>
+                        <div class="status-right-block">
+                            <span class="status-badge-large">${statusText}</span>
                         </div>
                     </div>
                 `;
@@ -1040,11 +1055,11 @@
                 document.getElementById('statusText').innerHTML = `
                     <div class="status-ultima">
                         <div class="status-header-line">
-                            <span class="status-service-name">Omni</span>
+                            <span class="status-service-name">OMNI</span>
                             <span class="status-expiry">ошибка</span>
                         </div>
-                        <div class="status-center">
-                            <span class="status-badge">недоступно</span>
+                        <div class="status-right-block">
+                            <span class="status-badge-large">недоступно</span>
                         </div>
                     </div>
                 `;
@@ -1080,8 +1095,14 @@
                 const data = await fetchWithAuth(API_URL + '/api/create_invoice', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tariff })
                 });
-                if (data.invoice_link) tg.openInvoice(data.invoice_link);
-                else alert('Ошибка создания счёта');
+                if (data.invoice_link) {
+                    tg.openInvoice(data.invoice_link, async function(status) {
+                        if (status === 'paid') {
+                            // После успешной оплаты обновляем статус
+                            await loadStatus();
+                        }
+                    });
+                } else alert('Ошибка создания счёта');
             } catch (e) { alert('Ошибка: ' + e.message); }
         }
 
@@ -1182,6 +1203,7 @@
         function finishSetup() { backToMain(); }
         function openSupport() { tg.openTelegramLink('https://t.me/' + SUPPORT_BOT_USERNAME); }
 
+        // Первоначальная загрузка статуса
         loadStatus();
     </script>
 </body>

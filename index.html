@@ -94,6 +94,20 @@
             50% { transform: scale(1.05); opacity: 0.95; }
         }
 
+        /* Версия приложения — еле заметна в правом верхнем углу */
+        .app-version {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            font-size: 10px;
+            opacity: 0.3;
+            color: var(--text-color);
+            z-index: 1001;
+            pointer-events: none;
+            user-select: none;
+            transition: opacity 0.2s;
+        }
+
         .theme-switcher {
             position: fixed;
             top: 16px;
@@ -779,6 +793,9 @@
 </head>
 <body>
  
+    <!-- Версия приложения -->
+    <div class="app-version">Версия 2.31</div>
+
     <div class="theme-switcher">
         <div class="theme-button" id="themeToggle">☀️</div> 
         <div class="theme-menu" id="themeMenu">
@@ -1074,7 +1091,7 @@
         const logoImg = document.getElementById('logoImg');
         const LOGO_WHITE = 'https://raw.githubusercontent.com/marktvencc-hue/omnivpn-webapp/main/photo_5226932146939826416_c.png';
         const LOGO_BLACK = 'https://raw.githubusercontent.com/marktvencc-hue/omnivpn-webapp/main/photo_5226932146939826416_cBLACK.png';
-=
+
         const themeToggle = document.getElementById('themeToggle');
         const themeMenu = document.getElementById('themeMenu');
         const themeOptions = document.querySelectorAll('.theme-option');
@@ -1374,4 +1391,3 @@
     </script>
 </body>
 </html>
-
